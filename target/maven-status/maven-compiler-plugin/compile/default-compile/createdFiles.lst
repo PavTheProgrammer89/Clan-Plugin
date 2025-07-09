@@ -1,0 +1,6 @@
+com\naufalverse\iclan\managers\DataManager.class
+com\naufalverse\iclan\managers\ClanManager.class
+com\naufalverse\iclan\objects\Clan.class
+com\naufalverse\iclan\commands\ClanCommand.class
+com\naufalverse\iclan\IClanPlugin.class
+com\naufalverse\iclan\managers\InvitationManager.class
