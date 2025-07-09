@@ -24,8 +24,8 @@ permissions:
       iclan.info: true
       iclan.list: true
       iclan.accept: true
-      iclan.kick: true
-      iclan.disband: true
+      iclan.kick: false
+      iclan.disband: false
 
   iclan.create:
     description: Allows creating clans
@@ -53,7 +53,7 @@ permissions:
 
   iclan.kick:
     description: Allows kicking clan members
-    default: true
+    default: false
 
   iclan.disband:
     description: Allows disbanding clans
@@ -61,7 +61,7 @@ permissions:
 
   iclan.owner:
     description: Allows clan owner commands
-    default: true
+    default: false
     children:
       iclan.accept: true
       iclan.kick: true
