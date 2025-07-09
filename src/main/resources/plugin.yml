@@ -92,4 +92,4 @@ permissions:
   
   iclan.backup:
     description: Allows backing up clan data
-    default: op
+    default: admin

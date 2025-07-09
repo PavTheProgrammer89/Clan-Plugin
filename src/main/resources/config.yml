@@ -23,7 +23,7 @@ chat:
 
 # Welcome message when someone joins a clan
 welcome-message: "&cWelcome to %clan%&c!"
-
+# add color config associated with welcome message here later
 
 # Bad words filter
 badwords:
