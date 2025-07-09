@@ -54,7 +54,7 @@ permissions:
   
   iclan.accept:
     description: Allows accepting clan members
-    default: false
+    default: true
   
   iclan.kick:
     description: Allows kicking clan members

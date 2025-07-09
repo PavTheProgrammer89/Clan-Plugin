@@ -1,5 +1,5 @@
 name: iClan
-version: 1.1.32
+version: 1.1.34
 main: com.naufalverse.iclan.IClanPlugin
 api-version: 1.21
 author: NaufalVerse
@@ -54,7 +54,7 @@ permissions:
   
   iclan.accept:
     description: Allows accepting clan members
-    default: false
+    default: true
   
   iclan.kick:
     description: Allows kicking clan members
