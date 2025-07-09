@@ -14,10 +14,11 @@ A simple and efficient clan management plugin for PaperMC 1.21.7 servers.
 
 ## 📦 Installation
 
-1. **Download** the latest `iClan-1.0.0.jar` from the [releases page](https://github.com/PavTheProgrammer89/Clan-Plugin/releases)
-2. **Place** the JAR file in your server's `plugins/` folder
-3. **Restart** your PaperMC server
-4. **Done!** The plugin will generate its configuration files automatically
+1. **Download** the latest `Clan-Plugin-main.zip` from the [releases page](https://github.com/PavTheProgrammer89/Clan-Plugin/releases)
+2. **Unzip** the .zip file
+3. **Check** for the .jar in file build/libs
+4. **Restart** your PaperMC server
+5. **Done!** The plugin will generate its configuration files automatically
 
 ## 🎮 Commands
 
