@@ -1,5 +1,5 @@
 name: iClan
-version: 1.1.37
+version: 1.1.40
 main: com.naufalverse.iclan.IClanPlugin
 api-version: 1.21
 author: NaufalVerse
@@ -26,6 +26,7 @@ permissions:
       iclan.accept: true
       iclan.kick: false
       iclan.disband: false
+      iclan.chat: true
 
   iclan.create:
     description: Allows creating clans
@@ -59,6 +60,14 @@ permissions:
     description: Allows disbanding clans
     default: true
 
+  iclan.chat:
+    description: Allows using clan chat
+    default: true
+
+  iclan.spy:
+    description: Allows viewing all clan chats
+    default: op
+
   iclan.owner:
     description: Allows clan owner commands
     default: false
@@ -66,7 +75,7 @@ permissions:
       iclan.accept: true
       iclan.kick: true
       iclan.disband: true
-  
+
   iclan.admin:
     description: Allows admin commands
     default: op
@@ -75,6 +84,7 @@ permissions:
       iclan.owner: true
       iclan.reload: true
       iclan.backup: true
+      iclan.spy: true
   
   iclan.reload:
     description: Allows reloading the plugin

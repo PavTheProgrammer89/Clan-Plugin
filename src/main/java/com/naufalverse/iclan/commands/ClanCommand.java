@@ -64,6 +64,10 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             case "list":
                 handleList(player);
                 break;
+            case "chat":
+            case "c":
+                handleChat(player, args);
+                break;
             default:
                 sendHelpMessage(player);
                 break;
@@ -453,6 +457,75 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         }
     }
 
+    private void handleChat(Player player, String[] args) {
+        UUID playerUUID = player.getUniqueId();
+
+        // Check permissions
+        if (!player.hasPermission("iclan.chat")) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "You don't have permission to use clan chat!");
+            return;
+        }
+
+        // Check if player is in a clan
+        Clan clan = plugin.getClanManager().getPlayerClan(playerUUID);
+        if (clan == null) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "You must be in a clan to use clan chat!");
+            return;
+        }
+
+        // Check if message provided
+        if (args.length < 2) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "Usage: /clan chat <message>");
+            player.sendMessage(ChatColor.GRAY + "Or use: /clan c <message>");
+            return;
+        }
+
+        // Build the message from all arguments after "chat"
+        StringBuilder messageBuilder = new StringBuilder();
+        for (int i = 1; i < args.length; i++) {
+            messageBuilder.append(args[i]);
+            if (i < args.length - 1) {
+                messageBuilder.append(" ");
+            }
+        }
+        String message = messageBuilder.toString();
+
+        // Format the clan chat message
+        String formattedMessage = ChatColor.DARK_GREEN + "[" + ChatColor.GREEN + "CLAN" + ChatColor.DARK_GREEN + "] "
+                + ChatColor.YELLOW + player.getName() + ChatColor.GRAY + ": "
+                + ChatColor.WHITE + message;
+
+        // Send to all clan members
+        int recipientCount = 0;
+        for (UUID memberUUID : clan.getMembers()) {
+            Player member = Bukkit.getPlayer(memberUUID);
+            if (member != null && member.isOnline()) {
+                member.playSound(member.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 0.7f, 1.2f);
+                member.sendMessage(formattedMessage);
+                recipientCount++;
+            }
+        }
+
+        // Send to all OPs who aren't in the clan (spy feature)
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer.isOp() && !clan.isMember(onlinePlayer.getUniqueId())) {
+                if (onlinePlayer.hasPermission("iclan.spy") || onlinePlayer.hasPermission("iclan.admin")) {
+                    String spyMessage = ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "SPY" + ChatColor.DARK_GRAY + "] "
+                            + ChatColor.DARK_GREEN + "[" + ChatColor.GREEN + clan.getName() + ChatColor.DARK_GREEN + "] "
+                            + ChatColor.YELLOW + player.getName() + ChatColor.GRAY + ": "
+                            + ChatColor.WHITE + message;
+                    onlinePlayer.sendMessage(spyMessage);
+                }
+            }
+        }
+
+        // Confirmation to sender
+        player.sendMessage(ChatColor.GRAY + "Message sent to " + ChatColor.WHITE + recipientCount + ChatColor.GRAY + " clan members.");
+    }
+
     private void handleList(Player player) {
         // Check permissions
         if (!player.hasPermission("iclan.list")) {
@@ -489,6 +562,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ChatColor.YELLOW + "/clan leave" + ChatColor.GRAY + " - Leave your current clan");
         player.sendMessage(ChatColor.YELLOW + "/clan kick <username>" + ChatColor.GRAY + " - Kick a member from your clan (owner only)");
         player.sendMessage(ChatColor.YELLOW + "/clan disband" + ChatColor.GRAY + " - Disband your clan (owner only)");
+        player.sendMessage(ChatColor.YELLOW + "/clan chat <message>" + ChatColor.GRAY + " - Send a message to your clan");
         player.sendMessage(ChatColor.YELLOW + "/clan list" + ChatColor.GRAY + " - List all clans");
         player.sendMessage(ChatColor.GOLD + "=====================");
     }
@@ -498,7 +572,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {
-            List<String> subcommands = Arrays.asList("create", "join", "accept", "info", "leave", "kick", "disband", "list");
+            List<String> subcommands = Arrays.asList("create", "join", "accept", "info", "leave", "kick", "disband", "list", "chat");
             for (String subcommand : subcommands) {
                 if (subcommand.startsWith(args[0].toLowerCase())) {
                     completions.add(subcommand);
@@ -523,6 +597,10 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                             completions.add(player.getName());
                         }
                     }
+                    break;
+                case "chat":
+                case "c":
+                    // No tab completion for chat messages
                     break;
             }
         }
