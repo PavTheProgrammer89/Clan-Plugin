@@ -1,28 +1,82 @@
 name: iClan
-version: "1.0.0"
+version: 1.0.0
 main: com.naufalverse.iclan.IClanPlugin
-api-version: "1.21"
-author: NaufalVerse & incognit56
-description: A clan management plugin for Minecraft servers
+api-version: 1.21
+author: NaufalVerse
+description: A simple clan management plugin for PaperMC servers
+website: https://naufalverse.com
 
 commands:
   clan:
-    description: Main clan management command
-    usage: "/clan create <name> - Create a new clan"
-    aliases: [clans, c]
-    permission: clans.use
-    permission-message: "You don't have permission to use clan commands!"
+    description: Main clan command
+    usage: /clan <subcommand>
+    aliases: [c, clans]
+    permission-message: "You don't have permission to use this command!"
 
 permissions:
-  clans.use:
-    description: Basic permission to use clan commands
+  iclan.user:
+    description: Allows basic clan usage
     default: true
-  clans.create:
-    description: Permission to create a clan
+    children:
+      iclan.create: true
+      iclan.join: true
+      iclan.leave: true
+      iclan.info: true
+      iclan.list: true
+  
+  iclan.create:
+    description: Allows creating clans
     default: true
-  clans.admin:
-    description: Admin permissions for clan management
+  
+  iclan.join:
+    description: Allows joining clans
+    default: true
+  
+  iclan.leave:
+    description: Allows leaving clans
+    default: true
+  
+  iclan.info:
+    description: Allows viewing clan information
+    default: true
+  
+  iclan.list:
+    description: Allows listing all clans
+    default: true
+  
+  iclan.owner:
+    description: Allows clan owner commands
+    default: false
+    children:
+      iclan.accept: true
+      iclan.kick: true
+      iclan.disband: true
+  
+  iclan.accept:
+    description: Allows accepting clan members
+    default: false
+  
+  iclan.kick:
+    description: Allows kicking clan members
+    default: false
+  
+  iclan.disband:
+    description: Allows disbanding clans
+    default: false
+  
+  iclan.admin:
+    description: Allows admin commands
     default: op
     children:
-      clans.use: true
-      clans.create: true
+      iclan.user: true
+      iclan.owner: true
+      iclan.reload: true
+      iclan.backup: true
+  
+  iclan.reload:
+    description: Allows reloading the plugin
+    default: op
+  
+  iclan.backup:
+    description: Allows backing up clan data
+    default: op
