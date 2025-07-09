@@ -22,16 +22,17 @@ A simple and efficient clan management plugin for PaperMC 1.21.7 servers.
 
 ## 🎮 Commands
 
-| Command | Description | Permission |
-|---------|-------------|------------|
-| `/clan create <name>` | Create a new clan | `iclan.create` |
-| `/clan join <name>` | Request to join a clan | `iclan.join` |
-| `/clan accept <username>` | Accept a player into your clan | `iclan.accept` |
-| `/clan info [name]` | Show clan information | `iclan.info` |
-| `/clan leave` | Leave your current clan | `iclan.leave` |
-| `/clan kick <username>` | Kick a member from your clan | `iclan.kick` |
-| `/clan disband` | Disband your clan | `iclan.disband` |
-| `/clan list` | List all clans on the server | `iclan.list` |
+| Command                   | Description                    | Permission      |
+|---------------------------|--------------------------------|-----------------|
+| `/clan create <name>`     | Create a new clan              | `iclan.create`  |
+| `/clan join <name>`       | Request to join a clan         | `iclan.join`    |
+| `/clan accept <username>` | Accept a player into your clan | `iclan.accept`  |
+| `/clan info [name]`       | Show clan information          | `iclan.info`    |
+| `/clan leave`             | Leave your current clan        | `iclan.leave`   |
+| `/clan kick <username>`   | Kick a member from your clan   | `iclan.kick`    |
+| `/clan disband`           | Disband your clan              | `iclan.disband` |
+| `/clan list`              | List all clans on the server   | `iclan.list`    |
+| `/clan chat`              | Chat with your clan            | `iclan.chat`    |
 
 ### Command Aliases
 - `/clan` can also be used as `/c` or `/clans`
