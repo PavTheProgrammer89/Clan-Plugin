@@ -23,46 +23,49 @@ permissions:
       iclan.leave: true
       iclan.info: true
       iclan.list: true
-  
+      iclan.accept: true
+      iclan.kick: true
+      iclan.disband: true
+
   iclan.create:
     description: Allows creating clans
     default: true
-  
+
   iclan.join:
     description: Allows joining clans
     default: true
-  
+
   iclan.leave:
     description: Allows leaving clans
     default: true
-  
+
   iclan.info:
     description: Allows viewing clan information
     default: true
-  
+
   iclan.list:
     description: Allows listing all clans
     default: true
-  
+
+  iclan.accept:
+    description: Allows accepting clan members
+    default: true
+
+  iclan.kick:
+    description: Allows kicking clan members
+    default: true
+
+  iclan.disband:
+    description: Allows disbanding clans
+    default: true
+
   iclan.owner:
     description: Allows clan owner commands
-    default: false
+    default: true
     children:
       iclan.accept: true
       iclan.kick: true
       iclan.disband: true
-  
-  iclan.accept:
-    description: Allows accepting clan members
-    default: false
-  
-  iclan.kick:
-    description: Allows kicking clan members
-    default: false
-  
-  iclan.disband:
-    description: Allows disbanding clans
-    default: false
   
   iclan.admin:
     description: Allows admin commands

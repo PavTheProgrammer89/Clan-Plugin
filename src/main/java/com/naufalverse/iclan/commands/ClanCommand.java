@@ -161,17 +161,19 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         // Send invitation request
         plugin.getInvitationManager().addInvitation(playerUUID, clanName);
 
-        // Notify clan owner
-        Player owner = Bukkit.getPlayer(clan.getOwner());
-        if (owner != null && owner.isOnline()) {
-            owner.playSound(owner.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.5f);
-            owner.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.GRAY + " wants to join your clan!");
-            owner.sendMessage(ChatColor.GRAY + "Use " + ChatColor.WHITE + "/clan accept " + player.getName() + ChatColor.GRAY + " to accept them.");
+        // Notify ALL clan members (not just owner)
+        for (UUID memberUUID : clan.getMembers()) {
+            Player member = Bukkit.getPlayer(memberUUID);
+            if (member != null && member.isOnline()) {
+                member.playSound(member.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.5f);
+                member.sendMessage(ChatColor.YELLOW + player.getName() + ChatColor.GRAY + " wants to join your clan!");
+                member.sendMessage(ChatColor.GRAY + "Use " + ChatColor.WHITE + "/clan accept " + player.getName() + ChatColor.GRAY + " to accept them.");
+            }
         }
 
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
         player.sendMessage(ChatColor.GREEN + "Join request sent to clan: " + ChatColor.YELLOW + clanName);
-        player.sendMessage(ChatColor.GRAY + "Wait for the clan owner to accept your request.");
+        player.sendMessage(ChatColor.GRAY + "Wait for any clan member to accept your request.");
     }
 
     private void handleAccept(Player player, String[] args) {
@@ -191,11 +193,11 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        // Check if player owns a clan
+        // Check if player is in a clan (any member can accept)
         Clan clan = plugin.getClanManager().getPlayerClan(playerUUID);
-        if (clan == null || !clan.isOwner(playerUUID)) {
+        if (clan == null) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
-            player.sendMessage(ChatColor.RED + "You must be a clan owner to accept members!");
+            player.sendMessage(ChatColor.RED + "You must be in a clan to accept members!");
             return;
         }
 
@@ -235,6 +237,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
         targetPlayer.playSound(targetPlayer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
         targetPlayer.sendMessage(ChatColor.GREEN + "You have been accepted into clan: " + ChatColor.YELLOW + clan.getName());
+        targetPlayer.sendMessage(ChatColor.GRAY + "Accepted by: " + ChatColor.WHITE + player.getName());
 
         // Notify other clan members
         for (UUID memberUUID : clan.getMembers()) {
@@ -242,6 +245,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             if (member != null && member.isOnline() && !member.equals(player) && !member.equals(targetPlayer)) {
                 member.playSound(member.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 0.7f, 1.0f);
                 member.sendMessage(ChatColor.YELLOW + targetName + ChatColor.GRAY + " has joined the clan!");
+                member.sendMessage(ChatColor.GRAY + "Accepted by: " + ChatColor.WHITE + player.getName());
             }
         }
     }
@@ -480,11 +484,11 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ChatColor.GOLD + "=== iClan Commands ===");
         player.sendMessage(ChatColor.YELLOW + "/clan create <name>" + ChatColor.GRAY + " - Create a new clan");
         player.sendMessage(ChatColor.YELLOW + "/clan join <name>" + ChatColor.GRAY + " - Request to join a clan");
-        player.sendMessage(ChatColor.YELLOW + "/clan accept <username>" + ChatColor.GRAY + " - Accept a player into your clan");
+        player.sendMessage(ChatColor.YELLOW + "/clan accept <username>" + ChatColor.GRAY + " - Accept a player into your clan (any member)");
         player.sendMessage(ChatColor.YELLOW + "/clan info [name]" + ChatColor.GRAY + " - Show clan information");
         player.sendMessage(ChatColor.YELLOW + "/clan leave" + ChatColor.GRAY + " - Leave your current clan");
-        player.sendMessage(ChatColor.YELLOW + "/clan kick <username>" + ChatColor.GRAY + " - Kick a member from your clan");
-        player.sendMessage(ChatColor.YELLOW + "/clan disband" + ChatColor.GRAY + " - Disband your clan");
+        player.sendMessage(ChatColor.YELLOW + "/clan kick <username>" + ChatColor.GRAY + " - Kick a member from your clan (owner only)");
+        player.sendMessage(ChatColor.YELLOW + "/clan disband" + ChatColor.GRAY + " - Disband your clan (owner only)");
         player.sendMessage(ChatColor.YELLOW + "/clan list" + ChatColor.GRAY + " - List all clans");
         player.sendMessage(ChatColor.GOLD + "=====================");
     }
