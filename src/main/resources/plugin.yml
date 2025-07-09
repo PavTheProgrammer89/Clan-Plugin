@@ -1,20 +1,28 @@
-main: ${PACKAGE}.${NAME}
-name: ${NAME}
-version: "${VERSION}"
-api-version: "1.21.1"
-author: AUTHOR
-description: DESCRIPTION
+name: iClan
+version: "1.0.0"
+main: com.naufalverse.iclan.IClanPlugin
+api-version: "1.21"
+author: NaufalVerse & incognit56
+description: A clan management plugin for Minecraft servers
+
 commands:
-  ex:
-    description: Base command for EXAMPLE
-    usage: "For a list of commands, type /ex help"
-    aliases: example
+  clan:
+    description: Main clan management command
+    usage: "/clan create <name> - Create a new clan"
+    aliases: [clans, c]
+    permission: clans.use
+    permission-message: "You don't have permission to use clan commands!"
+
 permissions:
-  example.test:
-    description: DESCRIPTION
+  clans.use:
+    description: Basic permission to use clan commands
     default: true
-  example.*:
-    description: Grants all other permissions
-    default: false
+  clans.create:
+    description: Permission to create a clan
+    default: true
+  clans.admin:
+    description: Admin permissions for clan management
+    default: op
     children:
-      example.test: true
+      clans.use: true
+      clans.create: true
