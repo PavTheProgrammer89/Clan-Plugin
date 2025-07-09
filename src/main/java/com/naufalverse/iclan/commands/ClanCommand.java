@@ -28,7 +28,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
             sender.sendMessage(ChatColor.RED + "Only players can use clan commands!");
             return true;
         }
