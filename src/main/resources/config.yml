@@ -3,7 +3,7 @@
 
 # Plugin Settings
 plugin:
-  version: "1.1.44"
+  version: "1.1.49"
   debug: false
 
 # Clan Settings
