@@ -1,0 +1,56 @@
+# iClan Plugin Configuration File
+# Configuration for the iClan plugin
+
+# Plugin Settings
+plugin:
+  version: "1.1.44"
+  debug: false
+
+# Clan Settings
+clan:
+  max-members: 100
+  min-name-length: 3
+  max-name-length: 10
+  allow-color-codes: true
+  auto-save: true
+
+# Chat Settings
+chat:
+  prefix: "%clan%"  # %clan% will be replaced with the clan name
+  enable-spy-mode: false
+  chat-cooldown: 0  # seconds between messages (0 = disabled)
+
+
+# Welcome message when someone joins a clan
+welcome-message: "&cWelcome to %clan%&c!"
+
+
+# Bad words filter
+badwords:
+  - "rape"
+  - "boobs"
+
+
+# Sound Settings
+sounds:
+  enable-sounds: true
+  success-sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+  error-sound: "BLOCK_NOTE_BLOCK_BASS"
+  notification-sound: "BLOCK_NOTE_BLOCK_PLING"
+  chat-sound: "BLOCK_NOTE_BLOCK_CHIME"
+
+# Admins
+admins:
+  - "incognit56"
+  - "NaufalVerse"
+  -
+# Messages
+messages:
+  prefix: "&6[iClan] &r"
+  no-permission: "&cYou don't have permission to do that!"
+  not-in-clan: "&cYou are not in a clan!"
+  already-in-clan: "&cYou are already in a clan!"
+  clan-not-found: "&cClan '%clan%' does not exist!"
+  player-not-found: "&cPlayer '%player%' is not online!"
+  clan-created: "&aSuccessfully created clan: &e%clan%"
+  clan-disbanded: "&aSuccessfully disbanded clan: &e%clan%"

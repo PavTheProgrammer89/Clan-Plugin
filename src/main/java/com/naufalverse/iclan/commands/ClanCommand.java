@@ -1,5 +1,6 @@
 package com.naufalverse.iclan.commands;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.bukkit.entity.Player;
 
 import com.naufalverse.iclan.IClanPlugin;
 import com.naufalverse.iclan.objects.Clan;
+import org.bukkit.event.player.PlayerChatEvent;
 
 public class ClanCommand implements CommandExecutor, TabCompleter {
 
@@ -107,10 +109,14 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        // Validate clan name (alphanumeric, 3-16 characters)
-        if (!clanName.matches("^[a-zA-Z0-9]{3,16}$")) {
+        // Use config values for validation
+        int minLength = plugin.getConfigManager().getMinNameLength();
+        int maxLength = plugin.getConfigManager().getMaxNameLength();
+        String pattern = "^[a-zA-Z0-9]{" + minLength + "," + maxLength + "}$";
+
+        if (!clanName.matches(pattern)) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
-            player.sendMessage(ChatColor.RED + "Clan name must be 3-16 characters long and contain only letters and numbers!");
+            player.sendMessage(ChatColor.RED + "Clan name must be " + minLength + "-" + maxLength + " characters long and contain only letters and numbers!");
             return;
         }
 
@@ -242,6 +248,11 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         targetPlayer.playSound(targetPlayer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
         targetPlayer.sendMessage(ChatColor.GREEN + "You have been accepted into clan: " + ChatColor.YELLOW + clan.getName());
         targetPlayer.sendMessage(ChatColor.GRAY + "Accepted by: " + ChatColor.WHITE + player.getName());
+// Get the welcome message from config and replace %clan% with actual clan name
+        String welcomeMessage = plugin.getConfigManager().getWelcomeMessage();
+        welcomeMessage = welcomeMessage.replace("%clan%", clan.getName());
+        welcomeMessage = ChatColor.translateAlternateColorCodes('&', welcomeMessage);
+        targetPlayer.sendMessage(welcomeMessage);
 
         // Notify other clan members
         for (UUID memberUUID : clan.getMembers()) {
@@ -493,8 +504,8 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         }
         String message = messageBuilder.toString();
 
-        // Format the clan chat message
-        String formattedMessage = ChatColor.DARK_GREEN + "[" + ChatColor.GREEN + "CLAN" + ChatColor.DARK_GREEN + "] "
+        // Format the clan chat message with dynamic prefix (clan name)
+        String formattedMessage = ChatColor.DARK_GREEN + "[" + ChatColor.GREEN + clan.getName() + ChatColor.DARK_GREEN + "] "
                 + ChatColor.YELLOW + player.getName() + ChatColor.GRAY + ": "
                 + ChatColor.WHITE + message;
 
@@ -509,21 +520,24 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        // Send to all OPs who aren't in the clan (spy feature)
+        // Silent monitoring for admins only (no indication to clan members)
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (onlinePlayer.isOp() && !clan.isMember(onlinePlayer.getUniqueId())) {
-                if (onlinePlayer.hasPermission("iclan.spy") || onlinePlayer.hasPermission("iclan.admin")) {
-                    String spyMessage = ChatColor.DARK_GRAY + "[" + ChatColor.GRAY + "SPY" + ChatColor.DARK_GRAY + "] "
-                            + ChatColor.DARK_GREEN + "[" + ChatColor.GREEN + clan.getName() + ChatColor.DARK_GREEN + "] "
-                            + ChatColor.YELLOW + player.getName() + ChatColor.GRAY + ": "
-                            + ChatColor.WHITE + message;
-                    onlinePlayer.sendMessage(spyMessage);
-                }
+            // Only send to admins who aren't in the clan
+            if (!clan.isMember(onlinePlayer.getUniqueId()) && isPlayerAdmin(onlinePlayer)) {
+                String adminMessage = ChatColor.DARK_GRAY + "[" + ChatColor.LIGHT_PURPLE + "[" + ChatColor.AQUA + clan.getName() + ChatColor.LIGHT_PURPLE + "] "
+                        + ChatColor.MAGIC + player.getName() + ChatColor.GRAY + ": "
+                        + ChatColor.BLUE + message;
+                onlinePlayer.sendMessage(adminMessage);
             }
         }
 
         // Confirmation to sender
-        player.sendMessage(ChatColor.GRAY + "Message sent to " + ChatColor.WHITE + recipientCount + ChatColor.GRAY + " clan members.");
+        player.sendMessage(ChatColor.BLACK + "Message sent to " + ChatColor.DARK_GRAY + recipientCount + ChatColor.BLACK + " clan members.");
+    }
+
+    // Helper method to check if player is admin
+    private boolean isPlayerAdmin(Player player) {
+        return plugin.getConfigManager().isAdmin(player.getName()) || player.isOp();
     }
 
     private void handleList(Player player) {
@@ -551,6 +565,19 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         }
         player.sendMessage(ChatColor.GOLD + "================");
     }
+
+
+    private void checkBadWords(Player player, String message, PlayerChatEvent event) {
+        List<String> badWords = plugin.getConfigManager().getBadWords();
+
+        // Loop through each bad word
+        for (String badWord : badWords) {
+            if (message.toLowerCase().contains(badWord.toLowerCase())) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
 
     private void sendHelpMessage(Player player) {
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
@@ -600,7 +627,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     break;
                 case "chat":
                 case "c":
-                    // No tab completion for chat messages
+                case "chat hey there clan, how yall doing?":
                     break;
             }
         }
