@@ -15,12 +15,10 @@ import com.naufalverse.iclan.managers.InvitationManager;
 import com.naufalverse.iclan.managers.ConfigManager;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-import org.jetbrains.annotations.Async;
-import org.w3c.dom.events.Event;
 
-import java.util.logging.Level;
+import java.util.List;
 
-public class IClanPlugin extends JavaPlugin {
+public class IClanPlugin extends JavaPlugin implements Listener {
 
     private ClanManager clanManager;
     private DataManager dataManager;
@@ -42,6 +40,9 @@ public class IClanPlugin extends JavaPlugin {
 
         // Register commands
         getCommand("clan").setExecutor(new ClanCommand(this));
+
+        // Register events
+        getServer().getPluginManager().registerEvents(this, this);
 
         getLogger().info("iClan plugin has been enabled!");
         getLogger().info("Loaded " + clanManager.getClanCount() + " clans.");
@@ -78,52 +79,90 @@ public class IClanPlugin extends JavaPlugin {
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        String playerName = player.getName();
         String message = event.getMessage();
 
-        Clan clan = getClanManager().getClan(String.valueOf(player));
+        // Check for bad words first
+        checkBadWords(player, message, event);
 
-        String clanPrefix = (clan != null) ? ChatColor.BLACK + "[" + ChatColor.AQUA + clan.getName() + ChatColor.BLACK + "]" : "[NoClan]";
-        String formatted = clanPrefix + " <" + playerName + ">: " + message;
+        // If message was cancelled, don't continue
+        if (event.isCancelled()) {
+            return;
+        }
 
+        // Get player's clan correctly
+        Clan clan = clanManager.getPlayerClan(player.getUniqueId());
+
+        String clanPrefix = (clan != null) ?
+                ChatColor.BLACK + "[" + ChatColor.AQUA + clan.getName() + ChatColor.BLACK + "] " :
+                ChatColor.GRAY + "[NoClan] ";
+
+        String formatted = clanPrefix + player.getName() + ChatColor.WHITE + ": " + message;
         event.setFormat(formatted);
     }
 
-    public class IClanPlugin1 extends JavaPlugin implements Listener {
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        updatePlayerTabName(player);
+    }
 
-        @Override
-        public void onEnable() {
-            getServer().getPluginManager().registerEvents((Listener) this, this);
+    // Check for bad words in chat
+    private void checkBadWords(Player player, String message, AsyncPlayerChatEvent event) {
+        List<String> badWords = configManager.getBadWords();
+
+        // Loop through each bad word
+        for (String badWord : badWords) {
+            if (message.toLowerCase().contains(badWord.toLowerCase())) {
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "Watch your language!");
+                // No return here - keep checking other words
+            }
         }
+    }
 
-        public Clan getPlayerClan(Player player) {
-            return getClanManager().getClan(String.valueOf(player));
-        }
+    // Update player's name in tab list with clan prefix
+    private void updatePlayerTabName(Player player) {
+        Clan clan = clanManager.getPlayerClan(player.getUniqueId());
+        String clanPrefix = (clan != null) ?
+                ChatColor.GRAY + "[" + clan.getName() + "] " : "";
 
-        public void updatePlayerTabName(Player player) {
-            Clan clan = getPlayerClan(player);
-            String clanPrefix = (clan != null) ? ChatColor.GRAY + "[" + clan.getName() + "] " : "";
-
+        try {
             Scoreboard scoreboard = player.getScoreboard();
+            if (scoreboard == null) {
+                scoreboard = getServer().getScoreboardManager().getNewScoreboard();
+                player.setScoreboard(scoreboard);
+            }
+
+            // Create unique team name using player UUID to avoid conflicts
+            String teamName = "clan_" + player.getUniqueId().toString().substring(0, 8);
 
             // Remove old team if it exists
-            Team oldTeam = scoreboard.getTeam(player.getName());
-            if (oldTeam != null) oldTeam.unregister();
+            Team oldTeam = scoreboard.getTeam(teamName);
+            if (oldTeam != null) {
+                oldTeam.unregister();
+            }
 
-            // Create new team with player name as ID (unique per player)
-            Team team = scoreboard.registerNewTeam(player.getName());
+            // Create new team with unique name
+            Team team = scoreboard.registerNewTeam(teamName);
             team.setPrefix(clanPrefix);
             team.addEntry(player.getName());
 
             // Set in tab list
             player.setPlayerListName(team.getPrefix() + player.getName());
-        }
 
-        @EventHandler
-        public void onPlayerJoin(PlayerJoinEvent event) {
-            Player player = event.getPlayer();
-            updatePlayerTabName(player);
+        } catch (Exception e) {
+            // If scoreboard fails, just set player list name directly
+            player.setPlayerListName(clanPrefix + player.getName());
         }
     }
 
+    // Public method to update tab name when clan membership changes
+    public void updatePlayerTab(Player player) {
+        updatePlayerTabName(player);
+    }
+
+    // Helper method to check if player is admin
+    private boolean isPlayerAdmin(Player player) {
+        return configManager.isAdmin(player.getName()) || player.isOp();
+    }
 }
