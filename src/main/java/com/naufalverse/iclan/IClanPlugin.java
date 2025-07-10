@@ -4,13 +4,17 @@ import com.naufalverse.iclan.objects.Clan;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.naufalverse.iclan.commands.ClanCommand;
 import com.naufalverse.iclan.managers.ClanManager;
 import com.naufalverse.iclan.managers.DataManager;
 import com.naufalverse.iclan.managers.InvitationManager;
 import com.naufalverse.iclan.managers.ConfigManager;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Async;
 import org.w3c.dom.events.Event;
 
@@ -84,4 +88,42 @@ public class IClanPlugin extends JavaPlugin {
 
         event.setFormat(formatted);
     }
+
+    public class IClanPlugin1 extends JavaPlugin implements Listener {
+
+        @Override
+        public void onEnable() {
+            getServer().getPluginManager().registerEvents((Listener) this, this);
+        }
+
+        public Clan getPlayerClan(Player player) {
+            return getClanManager().getClan(String.valueOf(player));
+        }
+
+        public void updatePlayerTabName(Player player) {
+            Clan clan = getPlayerClan(player);
+            String clanPrefix = (clan != null) ? ChatColor.GRAY + "[" + clan.getName() + "] " : "";
+
+            Scoreboard scoreboard = player.getScoreboard();
+
+            // Remove old team if it exists
+            Team oldTeam = scoreboard.getTeam(player.getName());
+            if (oldTeam != null) oldTeam.unregister();
+
+            // Create new team with player name as ID (unique per player)
+            Team team = scoreboard.registerNewTeam(player.getName());
+            team.setPrefix(clanPrefix);
+            team.addEntry(player.getName());
+
+            // Set in tab list
+            player.setPlayerListName(team.getPrefix() + player.getName());
+        }
+
+        @EventHandler
+        public void onPlayerJoin(PlayerJoinEvent event) {
+            Player player = event.getPlayer();
+            updatePlayerTabName(player);
+        }
+    }
+
 }
