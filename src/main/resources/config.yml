@@ -3,14 +3,14 @@
 
 # Plugin Settings
 plugin:
-  version: "1.1.49"
+  version: "1.1.54"
   debug: false
 
 # Clan Settings
 clan:
   max-members: 100
   min-name-length: 3
-  max-name-length: 10
+  max-name-length: 15
   allow-color-codes: true
   auto-save: true
 
@@ -43,7 +43,6 @@ sounds:
 admins:
   - "incognit56"
   - "NaufalVerse"
-  -
 # Messages
 messages:
   prefix: "&6[iClan] &r"

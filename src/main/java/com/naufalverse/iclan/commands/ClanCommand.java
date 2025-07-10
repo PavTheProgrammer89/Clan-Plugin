@@ -505,7 +505,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         String message = messageBuilder.toString();
 
         // Format the clan chat message with dynamic prefix (clan name)
-        String formattedMessage = ChatColor.DARK_GREEN + "[" + ChatColor.GREEN + clan.getName() + ChatColor.DARK_GREEN + "] "
+        String formattedMessage = ChatColor.BLACK + "[" + ChatColor.AQUA + clan.getName() + ChatColor.BLACK + "] "
                 + ChatColor.YELLOW + player.getName() + ChatColor.GRAY + ": "
                 + ChatColor.WHITE + message;
 

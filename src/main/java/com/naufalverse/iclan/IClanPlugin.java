@@ -1,11 +1,20 @@
 package com.naufalverse.iclan;
 
+import com.naufalverse.iclan.objects.Clan;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.naufalverse.iclan.commands.ClanCommand;
 import com.naufalverse.iclan.managers.ClanManager;
 import com.naufalverse.iclan.managers.DataManager;
 import com.naufalverse.iclan.managers.InvitationManager;
 import com.naufalverse.iclan.managers.ConfigManager;
+import org.jetbrains.annotations.Async;
+import org.w3c.dom.events.Event;
+
+import java.util.logging.Level;
 
 public class IClanPlugin extends JavaPlugin {
 
@@ -60,5 +69,19 @@ public class IClanPlugin extends JavaPlugin {
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    @EventHandler
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        String playerName = player.getName();
+        String message = event.getMessage();
+
+        Clan clan = getClanManager().getClan(String.valueOf(player));
+
+        String clanPrefix = (clan != null) ? ChatColor.BLACK + "[" + ChatColor.AQUA + clan.getName() + ChatColor.BLACK + "]" : "[NoClan]";
+        String formatted = clanPrefix + " <" + playerName + ">: " + message;
+
+        event.setFormat(formatted);
     }
 }
