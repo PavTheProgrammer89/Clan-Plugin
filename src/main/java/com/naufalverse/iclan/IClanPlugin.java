@@ -124,7 +124,7 @@ public class IClanPlugin extends JavaPlugin implements Listener {
     private void updatePlayerTabName(Player player) {
         Clan clan = clanManager.getPlayerClan(player.getUniqueId());
         String clanPrefix = (clan != null) ?
-                ChatColor.GRAY + "[" + clan.getName() + "] " : "";
+                ChatColor.AQUA + "[" + clan.getName() + "] " : "";
 
         try {
             Scoreboard scoreboard = player.getScoreboard();

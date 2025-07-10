@@ -506,7 +506,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
         // Format the clan chat message with dynamic prefix (clan name)
         String formattedMessage = ChatColor.BLACK + "[" + ChatColor.AQUA + clan.getName() + ChatColor.BLACK + "] "
-                + ChatColor.MAGIC + player.getName() + ChatColor.GRAY + ": "
+                + ChatColor.DARK_RED + player.getName() + ChatColor.GRAY + ": "
                 + ChatColor.WHITE + message;
 
         // Send to all clan members
@@ -525,7 +525,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             // Only send to admins who aren't in the clan
             if (!clan.isMember(onlinePlayer.getUniqueId()) && isPlayerAdmin(onlinePlayer)) {
                 String adminMessage = ChatColor.DARK_GRAY + "[" + ChatColor.LIGHT_PURPLE + "[" + ChatColor.AQUA + clan.getName() + ChatColor.LIGHT_PURPLE + "] "
-                        + ChatColor.MAGIC + player.getName() + ChatColor.GRAY + ": "
+                        + ChatColor.DARK_RED + player.getName() + ChatColor.GRAY + ": "
                         + ChatColor.BLUE + message;
                 onlinePlayer.sendMessage(adminMessage);
             }
