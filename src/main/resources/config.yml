@@ -1,95 +1,55 @@
-name: iClan
-version: ${project.version}
-main: com.naufalverse.iclan.IClanPlugin
-api-version: 1.21
-author: NaufalVerse
-description: A simple clan management plugin for PaperMC servers
-website: https://naufalverse.com
+# iClan Plugin Configuration File
+# Configuration for the iClan plugin
 
-commands:
-  clan:
-    description: Main clan command
-    usage: /clan <subcommand>
-    aliases: [c, clans]
-    permission-message: "You don't have permission to use this command!"
+# Plugin Settings
+plugin:
+  version: "1.1.70"
+  debug: false
 
-permissions:
-  iclan.user:
-    description: Allows basic clan usage
-    default: true
-    children:
-      iclan.create: true
-      iclan.join: true
-      iclan.leave: true
-      iclan.info: true
-      iclan.list: true
-      iclan.accept: true
-      iclan.kick: false
-      iclan.disband: false
-      iclan.chat: true
+# Clan Settings
+clan:
+  max-members: 100
+  min-name-length: 3
+  max-name-length: 15
+  allow-color-codes: true
+  auto-save: true
 
-  iclan.create:
-    description: Allows creating clans
-    default: true
+# Chat Settings
+chat:
+  prefix: "%clan%"  # %clan% will be replaced with the clan name
+  enable-spy-mode: false
+  chat-cooldown: 0  # seconds between messages (0 = disabled)
 
-  iclan.join:
-    description: Allows joining clans
-    default: true
 
-  iclan.leave:
-    description: Allows leaving clans
-    default: true
+# Welcome message when someone joins a clan
+welcome-message: "&cWelcome to %clan%&c!"
+# add color config associated with welcome message here later
 
-  iclan.info:
-    description: Allows viewing clan information
-    default: true
+# Bad words filter
+badwords:
+  - "rape"
+  - "boobs"
 
-  iclan.list:
-    description: Allows listing all clans
-    default: true
 
-  iclan.accept:
-    description: Allows accepting clan members
-    default: true
+# Sound Settings
+sounds:
+  enable-sounds: true
+  success-sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+  error-sound: "BLOCK_NOTE_BLOCK_BASS"
+  notification-sound: "BLOCK_NOTE_BLOCK_PLING"
+  chat-sound: "BLOCK_NOTE_BLOCK_CHIME"
 
-  iclan.kick:
-    description: Allows kicking clan members
-    default: false
-
-  iclan.disband:
-    description: Allows disbanding clans
-    default: true
-
-  iclan.chat:
-    description: Allows using clan chat
-    default: true
-
-  iclan.spy:
-    description: Allows viewing all clan chats
-    default: op
-
-  iclan.owner:
-    description: Allows clan owner commands
-    default: false
-    children:
-      iclan.accept: true
-      iclan.kick: true
-      iclan.disband: true
-
-  iclan.admin:
-    description: Allows admin commands
-    default: op
-    children:
-      iclan.user: true
-      iclan.owner: true
-      iclan.reload: true
-      iclan.backup: true
-      iclan.spy: true
-  
-  iclan.reload:
-    description: Allows reloading the plugin
-    default: op
-  
-  iclan.backup:
-    description: Allows backing up clan data
-    default: op
+# Admins
+admins:
+  - "incognit56"
+  - "NaufalVerse"
+# Messages
+messages:
+  prefix: "&6[iClan] &r"
+  no-permission: "&cYou don't have permission to do that!"
+  not-in-clan: "&cYou are not in a clan!"
+  already-in-clan: "&cYou are already in a clan!"
+  clan-not-found: "&cClan '%clan%' does not exist!"
+  player-not-found: "&cPlayer '%player%' is not online!"
+  clan-created: "&aSuccessfully created clan: &e%clan%"
+  clan-disbanded: "&aSuccessfully disbanded clan: &e%clan%"
