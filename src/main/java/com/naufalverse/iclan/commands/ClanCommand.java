@@ -548,6 +548,10 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(ChatColor.YELLOW + "/clan disband" + ChatColor.GRAY + " - Disband your clan (owner only)");
             player.sendMessage(ChatColor.YELLOW + "/clan chat <message>" + ChatColor.GRAY + " - Send a message to your clan");
             player.sendMessage(ChatColor.YELLOW + "/clan list" + ChatColor.GRAY + " - List all clans");
+            player.sendMessage(ChatColor.BLACK + "=====================");
+            player.sendMessage(ChatColor.AQUA + "CREDITS");
+            player.sendMessage(ChatColor.BLUE + "zSLIDER_ FOR coming up with the idea");
+            player.sendMessage(ChatColor.AQUA + "NaufalVerse + incognit56 (formally Inco) FOR coding the plugin");
             player.sendMessage(ChatColor.GOLD + "=====================");
         }
     }
