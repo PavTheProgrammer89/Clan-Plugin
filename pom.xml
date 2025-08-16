@@ -8,7 +8,7 @@
     <!-- Project Information -->
     <groupId>com.naufalverse</groupId>
     <artifactId>iclan</artifactId>
-    <version>1.1.70</version>
+    <version>1.2.21</version>
     <packaging>jar</packaging>
 
     <name>iClan</name>
@@ -50,11 +50,19 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- JUnit for testing (optional) -->
+        <!-- JUnit for testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.10.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito for mocking in tests -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -139,7 +147,7 @@
             <!-- Maven Deploy Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-depmvn --versionloy-plugin</artifactId>
+                <artifactId>maven-deploy-plugin</artifactId>
                 <version>3.1.1</version>
             </plugin>
         </plugins>

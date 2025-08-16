@@ -15,31 +15,21 @@ public class ConfigManager {
         loadConfig();
     }
 
-    /**
-     * Load the configuration file
-     */
     public void loadConfig() {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
         this.config = plugin.getConfig();
     }
 
-    /**
-     * Reload the configuration
-     */
     public void reloadConfig() {
         plugin.reloadConfig();
         this.config = plugin.getConfig();
     }
 
-    /**
-     * Save the configuration
-     */
     public void saveConfig() {
         plugin.saveConfig();
     }
 
-    // Clan Settings
     public int getMaxMembers() {
         return config.getInt("clan.max-members", 10);
     }
@@ -60,7 +50,6 @@ public class ConfigManager {
         return config.getBoolean("clan.auto-save", true);
     }
 
-    // Chat Settings
     public String getChatPrefix() {
         return config.getString("chat.prefix", "%clan%");
     }
@@ -82,7 +71,6 @@ public class ConfigManager {
         return config.getInt("chat.chat-cooldown", 0);
     }
 
-    // Sound Settings
     public boolean areSoundsEnabled() {
         return config.getBoolean("sounds.enable-sounds", true);
     }
@@ -103,7 +91,6 @@ public class ConfigManager {
         return config.getString("sounds.chat-sound", "BLOCK_NOTE_BLOCK_CHIME");
     }
 
-    // Admin Settings
     public List<String> getAdmins() {
         return config.getStringList("admins");
     }
@@ -130,7 +117,6 @@ public class ConfigManager {
         }
     }
 
-    // Messages
     public String getMessage(String key) {
         return config.getString("messages." + key, "&cMessage not found: " + key);
     }
@@ -139,7 +125,6 @@ public class ConfigManager {
         return config.getString("messages.prefix", "&6[iClan] &r");
     }
 
-    // Database Settings (for future use)
     public String getDatabaseType() {
         return config.getString("database.type", "YAML");
     }
@@ -172,14 +157,10 @@ public class ConfigManager {
         return config.getString("database.password", "");
     }
 
-    // Debug
     public boolean isDebugEnabled() {
         return config.getBoolean("plugin.debug", false);
     }
 
-    /**
-     * Get the raw configuration object
-     */
     public FileConfiguration getConfig() {
         return config;
     }

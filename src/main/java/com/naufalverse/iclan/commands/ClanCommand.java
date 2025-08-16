@@ -91,28 +91,24 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         String clanName = args[1];
         UUID playerUUID = player.getUniqueId();
 
-        // Check permissions
         if (!player.hasPermission("iclan.create")) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You don't have permission to create clans!");
             return;
         }
 
-        // Check if player is already in a clan
         if (plugin.getClanManager().getPlayerClan(playerUUID) != null) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You are already in a clan!");
             return;
         }
 
-        // Check if clan name already exists
         if (plugin.getClanManager().getClan(clanName) != null) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "A clan with that name already exists!");
             return;
         }
 
-        // Use config values for validation
         int minLength = plugin.getConfigManager().getMinNameLength();
         int maxLength = plugin.getConfigManager().getMaxNameLength();
         String pattern = "^[a-zA-Z0-9]{" + minLength + "," + maxLength + "}$";
@@ -123,7 +119,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        // Create the clan
         Clan clan = new Clan(clanName, playerUUID);
         plugin.getClanManager().createClan(clan);
 
@@ -142,21 +137,18 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         String clanName = args[1];
         UUID playerUUID = player.getUniqueId();
 
-        // Check permissions
         if (!player.hasPermission("iclan.join")) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You don't have permission to join clans!");
             return;
         }
 
-        // Check if player is already in a clan
         if (plugin.getClanManager().getPlayerClan(playerUUID) != null) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You are already in a clan!");
             return;
         }
 
-        // Check if clan exists
         Clan clan = plugin.getClanManager().getClan(clanName);
         if (clan == null) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
@@ -164,17 +156,14 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        // Check if player already has a pending invitation
         if (plugin.getInvitationManager().hasInvitation(playerUUID, clanName)) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You already have a pending invitation to this clan!");
             return;
         }
 
-        // Send invitation request
         plugin.getInvitationManager().addInvitation(playerUUID, clanName);
 
-        // Notify ALL clan members (not just owner)
         for (UUID memberUUID : clan.getMembers()) {
             Player member = Bukkit.getPlayer(memberUUID);
             if (member != null && member.isOnline()) {
@@ -199,14 +188,12 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         String targetName = args[1];
         UUID playerUUID = player.getUniqueId();
 
-        // Check permissions
         if (!player.hasPermission("iclan.accept")) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You don't have permission to accept clan members!");
             return;
         }
 
-        // Check if player is in a clan (any member can accept)
         Clan clan = plugin.getClanManager().getPlayerClan(playerUUID);
         if (clan == null) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
@@ -214,7 +201,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        // Get target player
         Player targetPlayer = Bukkit.getPlayer(targetName);
         if (targetPlayer == null) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
@@ -224,14 +210,12 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
         UUID targetUUID = targetPlayer.getUniqueId();
 
-        // Check if target has invitation
         if (!plugin.getInvitationManager().hasInvitation(targetUUID, clan.getName())) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "Player '" + targetName + "' has not requested to join your clan!");
             return;
         }
 
-        // Check if target is already in a clan
         if (plugin.getClanManager().getPlayerClan(targetUUID) != null) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "Player '" + targetName + "' is already in a clan!");
@@ -239,25 +223,21 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        // Add player to clan
         clan.addMember(targetUUID);
         plugin.getClanManager().addMemberToClan(targetUUID, clan.getName());
         plugin.getInvitationManager().removeInvitation(targetUUID, clan.getName());
 
-        // Notify both players
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
         player.sendMessage(ChatColor.GREEN + "You accepted " + ChatColor.YELLOW + targetName + ChatColor.GREEN + " into your clan!");
 
         targetPlayer.playSound(targetPlayer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
         targetPlayer.sendMessage(ChatColor.GREEN + "You have been accepted into clan: " + ChatColor.YELLOW + clan.getName());
         targetPlayer.sendMessage(ChatColor.GRAY + "Accepted by: " + ChatColor.WHITE + player.getName());
-// Get the welcome message from config and replace %clan% with actual clan name
         String welcomeMessage = plugin.getConfigManager().getWelcomeMessage();
         welcomeMessage = welcomeMessage.replace("%clan%", clan.getName());
         welcomeMessage = ChatColor.translateAlternateColorCodes('&', welcomeMessage);
         targetPlayer.sendMessage(welcomeMessage);
 
-        // Notify other clan members
         for (UUID memberUUID : clan.getMembers()) {
             Player member = Bukkit.getPlayer(memberUUID);
             if (member != null && member.isOnline() && !member.equals(player) && !member.equals(targetPlayer)) {
@@ -271,7 +251,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private void handleInfo(Player player, String[] args) {
         UUID playerUUID = player.getUniqueId();
 
-        // Check permissions
         if (!player.hasPermission("iclan.info")) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You don't have permission to view clan info!");
@@ -280,7 +259,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
         Clan clan;
         if (args.length == 1) {
-            // Show own clan info
             clan = plugin.getClanManager().getPlayerClan(playerUUID);
             if (clan == null) {
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
@@ -288,7 +266,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                 return;
             }
         } else {
-            // Show specific clan info
             String clanName = args[1];
             clan = plugin.getClanManager().getClan(clanName);
             if (clan == null) {
@@ -298,7 +275,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        // Display clan information
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
         player.sendMessage(ChatColor.GOLD + "=== Clan Information ===");
         player.sendMessage(ChatColor.YELLOW + "Name: " + ChatColor.WHITE + clan.getName());
@@ -309,7 +285,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
         player.sendMessage(ChatColor.YELLOW + "Members: " + ChatColor.WHITE + clan.getMemberCount());
 
-        // List online members
         List<String> onlineMembers = new ArrayList<>();
         for (UUID memberUUID : clan.getMembers()) {
             Player member = Bukkit.getPlayer(memberUUID);
@@ -328,7 +303,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private void handleLeave(Player player) {
         UUID playerUUID = player.getUniqueId();
 
-        // Check permissions
         if (!player.hasPermission("iclan.leave")) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You don't have permission to leave clans!");
@@ -354,7 +328,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.8f);
         player.sendMessage(ChatColor.GREEN + "You have left the clan: " + ChatColor.YELLOW + clan.getName());
 
-        // Notify other clan members
         for (UUID memberUUID : clan.getMembers()) {
             Player member = Bukkit.getPlayer(memberUUID);
             if (member != null && member.isOnline()) {
@@ -367,7 +340,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private void handleDisband(Player player) {
         UUID playerUUID = player.getUniqueId();
 
-        // Check permissions
         if (!player.hasPermission("iclan.disband")) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You don't have permission to disband clans!");
@@ -387,7 +359,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        // Notify all members
         for (UUID memberUUID : clan.getMembers()) {
             Player member = Bukkit.getPlayer(memberUUID);
             if (member != null && member.isOnline()) {
@@ -411,7 +382,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         String targetName = args[1];
         UUID playerUUID = player.getUniqueId();
 
-        // Check permissions
         if (!player.hasPermission("iclan.kick")) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You don't have permission to kick clan members!");
@@ -461,7 +431,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         targetPlayer.playSound(targetPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0f, 0.8f);
         targetPlayer.sendMessage(ChatColor.RED + "You have been kicked from clan: " + ChatColor.YELLOW + clan.getName());
 
-        // Notify other clan members
         for (UUID memberUUID : clan.getMembers()) {
             Player member = Bukkit.getPlayer(memberUUID);
             if (member != null && member.isOnline() && !member.equals(player)) {
@@ -474,14 +443,12 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private void handleChat(Player player, String[] args) {
         UUID playerUUID = player.getUniqueId();
 
-        // Check permissions
         if (!player.hasPermission("iclan.chat")) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You don't have permission to use clan chat!");
             return;
         }
 
-        // Check if player is in a clan
         Clan clan = plugin.getClanManager().getPlayerClan(playerUUID);
         if (clan == null) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
@@ -489,7 +456,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        // Check if message provided
         if (args.length < 2) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "Usage: /clan chat <message>");
@@ -497,7 +463,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        // Build the message from all arguments after "chat"
         StringBuilder messageBuilder = new StringBuilder();
         for (int i = 1; i < args.length; i++) {
             messageBuilder.append(args[i]);
@@ -507,12 +472,10 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         }
         String message = messageBuilder.toString();
 
-        // Format the clan chat message with dynamic prefix (clan name)
         String formattedMessage = ChatColor.BLACK + "[" + ChatColor.AQUA + clan.getName() + ChatColor.BLACK + "] "
                 + ChatColor.DARK_RED + player.getName() + ChatColor.GRAY + ": "
                 + ChatColor.WHITE + message;
 
-        // Send to all clan members
         int recipientCount = 0;
         for (UUID memberUUID : clan.getMembers()) {
             Player member = Bukkit.getPlayer(memberUUID);
@@ -523,9 +486,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        // Silent monitoring for admins only (no indication to clan members)
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            // Only send to admins who aren't in the clan
             if (!clan.isMember(onlinePlayer.getUniqueId()) && isPlayerAdmin(onlinePlayer)) {
                 String adminMessage = ChatColor.DARK_GRAY + "[" + ChatColor.LIGHT_PURPLE + "[" + ChatColor.AQUA + clan.getName() + ChatColor.LIGHT_PURPLE + "] "
                         + ChatColor.DARK_RED + player.getName() + ChatColor.GRAY + ": "
@@ -535,13 +496,11 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         }
     }
 
-    // Helper method to check if player is admin
     private boolean isPlayerAdmin(Player player) {
         return plugin.getConfigManager().isAdmin(player.getName()) || player.isOp();
     }
 
     private void handleList(Player player) {
-        // Check permissions
         if (!player.hasPermission("iclan.list")) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You don't have permission to list clans!");
@@ -569,7 +528,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     private void checkBadWords(Player player, String message, PlayerChatEvent event) {
         List<String> badWords = plugin.getConfigManager().getBadWords();
 
-        // Loop through each bad word
         for (String badWord : badWords) {
             if (message.toLowerCase().contains(badWord.toLowerCase())) {
                 event.setCancelled(true);
@@ -609,7 +567,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             switch (args[0].toLowerCase()) {
                 case "join":
                 case "info":
-                    // Add clan names
                     for (Clan clan : plugin.getClanManager().getAllClans()) {
                         if (clan.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
                             completions.add(clan.getName());
@@ -618,7 +575,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     break;
                 case "accept":
                 case "kick":
-                    // Add online player names
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         if (player.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
                             completions.add(player.getName());
@@ -627,7 +583,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     break;
                 case "chat":
                 case "c":
-                    // No tab completion for chat messages
                     break;
             }
         }

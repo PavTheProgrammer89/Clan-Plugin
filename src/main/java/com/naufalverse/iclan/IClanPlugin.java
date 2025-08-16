@@ -27,21 +27,16 @@ public class IClanPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        // Initialize config manager first
         this.configManager = new ConfigManager(this);
 
-        // Initialize other managers
         this.dataManager = new DataManager(this);
         this.clanManager = new ClanManager(this);
         this.invitationManager = new InvitationManager(this);
 
-        // Load data
         dataManager.loadData();
 
-        // Register commands
         getCommand("clan").setExecutor(new ClanCommand(this));
 
-        // Register events
         getServer().getPluginManager().registerEvents(this, this);
 
         getLogger().info("iClan plugin has been enabled!");
@@ -51,7 +46,6 @@ public class IClanPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        // Save data
         if (dataManager != null) {
             dataManager.saveData();
         }
@@ -59,7 +53,6 @@ public class IClanPlugin extends JavaPlugin implements Listener {
         getLogger().info("iClan plugin has been disabled!");
     }
 
-    // Getter methods
     public ClanManager getClanManager() {
         return clanManager;
     }
@@ -81,15 +74,12 @@ public class IClanPlugin extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
         String message = event.getMessage();
 
-        // Check for bad words first
         checkBadWords(player, message, event);
 
-        // If message was cancelled, don't continue
         if (event.isCancelled()) {
             return;
         }
 
-        // Get player's clan correctly
         Clan clan = clanManager.getPlayerClan(player.getUniqueId());
 
         String clanPrefix = (clan != null) ?
@@ -106,21 +96,17 @@ public class IClanPlugin extends JavaPlugin implements Listener {
         updatePlayerTabName(player);
     }
 
-    // Check for bad words in chat
     private void checkBadWords(Player player, String message, AsyncPlayerChatEvent event) {
         List<String> badWords = configManager.getBadWords();
 
-        // Loop through each bad word
         for (String badWord : badWords) {
             if (message.toLowerCase().contains(badWord.toLowerCase())) {
                 event.setCancelled(true);
                 player.sendMessage(ChatColor.RED + "Watch your language!");
-                // No return here - keep checking other words
             }
         }
     }
 
-    // Update player's name in tab list with clan prefix
     private void updatePlayerTabName(Player player) {
         Clan clan = clanManager.getPlayerClan(player.getUniqueId());
         String clanPrefix = (clan != null) ?
@@ -133,35 +119,28 @@ public class IClanPlugin extends JavaPlugin implements Listener {
                 player.setScoreboard(scoreboard);
             }
 
-            // Create unique team name using player UUID to avoid conflicts
             String teamName = "clan_" + player.getUniqueId().toString().substring(0, 8);
 
-            // Remove old team if it exists
             Team oldTeam = scoreboard.getTeam(teamName);
             if (oldTeam != null) {
                 oldTeam.unregister();
             }
 
-            // Create new team with unique name
             Team team = scoreboard.registerNewTeam(teamName);
             team.setPrefix(clanPrefix);
             team.addEntry(player.getName());
 
-            // Set in tab list
             player.setPlayerListName(team.getPrefix() + player.getName());
 
         } catch (Exception e) {
-            // If scoreboard fails, just set player list name directly
             player.setPlayerListName(clanPrefix + player.getName());
         }
     }
 
-    // Public method to update tab name when clan membership changes
     public void updatePlayerTab(Player player) {
         updatePlayerTabName(player);
     }
 
-    // Helper method to check if player is admin
     private boolean isPlayerAdmin(Player player) {
         return configManager.isAdmin(player.getName()) || player.isOp();
     }
