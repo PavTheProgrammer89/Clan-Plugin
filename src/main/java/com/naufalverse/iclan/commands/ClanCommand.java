@@ -70,6 +70,9 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             case "c":
                 handleChat(player, args);
                 break;
+            case "help":
+                sendHelpMessage(player);
+                break;
             default:
                 sendHelpMessage(player);
                 break;
@@ -563,7 +566,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ChatColor.GOLD + "================");
     }
 
-
     private void checkBadWords(Player player, String message, PlayerChatEvent event) {
         List<String> badWords = plugin.getConfigManager().getBadWords();
 
@@ -575,20 +577,21 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         }
     }
 
-
     private void sendHelpMessage(Player player) {
-        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
-        player.sendMessage(ChatColor.GOLD + "=== iClan Commands ===");
-        player.sendMessage(ChatColor.YELLOW + "/clan create <name>" + ChatColor.GRAY + " - Create a new clan");
-        player.sendMessage(ChatColor.YELLOW + "/clan join <name>" + ChatColor.GRAY + " - Request to join a clan");
-        player.sendMessage(ChatColor.YELLOW + "/clan accept <username>" + ChatColor.GRAY + " - Accept a player into your clan (any member)");
-        player.sendMessage(ChatColor.YELLOW + "/clan info [name]" + ChatColor.GRAY + " - Show clan information");
-        player.sendMessage(ChatColor.YELLOW + "/clan leave" + ChatColor.GRAY + " - Leave your current clan");
-        player.sendMessage(ChatColor.YELLOW + "/clan kick <username>" + ChatColor.GRAY + " - Kick a member from your clan (owner only)");
-        player.sendMessage(ChatColor.YELLOW + "/clan disband" + ChatColor.GRAY + " - Disband your clan (owner only)");
-        player.sendMessage(ChatColor.YELLOW + "/clan chat <message>" + ChatColor.GRAY + " - Send a message to your clan");
-        player.sendMessage(ChatColor.YELLOW + "/clan list" + ChatColor.GRAY + " - List all clans");
-        player.sendMessage(ChatColor.GOLD + "=====================");
+        if (!player.hasPermission("iclan.user")) {
+            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
+            player.sendMessage(ChatColor.GOLD + "=== iClan Commands ===");
+            player.sendMessage(ChatColor.YELLOW + "/clan create <name>" + ChatColor.GRAY + " - Create a new clan");
+            player.sendMessage(ChatColor.YELLOW + "/clan join <name>" + ChatColor.GRAY + " - Request to join a clan");
+            player.sendMessage(ChatColor.YELLOW + "/clan accept <username>" + ChatColor.GRAY + " - Accept a player into your clan (any member)");
+            player.sendMessage(ChatColor.YELLOW + "/clan info [name]" + ChatColor.GRAY + " - Show clan information");
+            player.sendMessage(ChatColor.YELLOW + "/clan leave" + ChatColor.GRAY + " - Leave your current clan");
+            player.sendMessage(ChatColor.YELLOW + "/clan kick <username>" + ChatColor.GRAY + " - Kick a member from your clan (owner only)");
+            player.sendMessage(ChatColor.YELLOW + "/clan disband" + ChatColor.GRAY + " - Disband your clan (owner only)");
+            player.sendMessage(ChatColor.YELLOW + "/clan chat <message>" + ChatColor.GRAY + " - Send a message to your clan");
+            player.sendMessage(ChatColor.YELLOW + "/clan list" + ChatColor.GRAY + " - List all clans");
+            player.sendMessage(ChatColor.GOLD + "=====================");
+        }
     }
 
     @Override
@@ -596,7 +599,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {
-            List<String> subcommands = Arrays.asList("create", "join", "accept", "info", "leave", "kick", "disband", "list", "chat");
+            List<String> subcommands = Arrays.asList("create", "join", "accept", "info", "leave", "kick", "disband", "list", "chat", "help");
             for (String subcommand : subcommands) {
                 if (subcommand.startsWith(args[0].toLowerCase())) {
                     completions.add(subcommand);
@@ -624,7 +627,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     break;
                 case "chat":
                 case "c":
-                case "chat hey there clan, how yall doing?":
+                    // No tab completion for chat messages
                     break;
             }
         }

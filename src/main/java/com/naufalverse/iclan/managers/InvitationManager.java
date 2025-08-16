@@ -9,22 +9,22 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InvitationManager {
-    
+
     private final IClanPlugin plugin;
     private final Map<UUID, Set<String>> invitations; // player UUID -> set of clan names
     private final Map<String, Long> invitationTime; // invitation key -> timestamp
-    
+
     private static final long INVITATION_TIMEOUT = 300000; // 5 minutes in milliseconds
-    
+
     public InvitationManager(IClanPlugin plugin) {
         this.plugin = plugin;
         this.invitations = new ConcurrentHashMap<>();
         this.invitationTime = new ConcurrentHashMap<>();
-        
+
         // Start cleanup task
         startCleanupTask();
     }
-    
+
     /**
      * Add an invitation
      */
@@ -32,7 +32,7 @@ public class InvitationManager {
         invitations.computeIfAbsent(playerUUID, k -> new HashSet<>()).add(clanName.toLowerCase());
         invitationTime.put(getInvitationKey(playerUUID, clanName), System.currentTimeMillis());
     }
-    
+
     /**
      * Remove an invitation
      */
@@ -46,7 +46,7 @@ public class InvitationManager {
         }
         invitationTime.remove(getInvitationKey(playerUUID, clanName));
     }
-    
+
     /**
      * Check if a player has an invitation to a specific clan
      */
@@ -57,14 +57,14 @@ public class InvitationManager {
         }
         return false;
     }
-    
+
     /**
      * Get all invitations for a player
      */
     public Set<String> getPlayerInvitations(UUID playerUUID) {
         return invitations.getOrDefault(playerUUID, new HashSet<>());
     }
-    
+
     /**
      * Get all players with invitations to a specific clan
      */
@@ -77,7 +77,7 @@ public class InvitationManager {
         }
         return result;
     }
-    
+
     /**
      * Remove all invitations for a player
      */
@@ -89,7 +89,7 @@ public class InvitationManager {
             }
         }
     }
-    
+
     /**
      * Remove all invitations for a clan
      */
@@ -98,17 +98,17 @@ public class InvitationManager {
         while (iterator.hasNext()) {
             Map.Entry<UUID, Set<String>> entry = iterator.next();
             Set<String> playerInvitations = entry.getValue();
-            
+
             if (playerInvitations.remove(clanName.toLowerCase())) {
                 invitationTime.remove(getInvitationKey(entry.getKey(), clanName));
             }
-            
+
             if (playerInvitations.isEmpty()) {
                 iterator.remove();
             }
         }
     }
-    
+
     /**
      * Get invitation count for a player
      */
@@ -116,14 +116,14 @@ public class InvitationManager {
         Set<String> playerInvitations = invitations.get(playerUUID);
         return playerInvitations != null ? playerInvitations.size() : 0;
     }
-    
+
     /**
      * Get total invitation count
      */
     public int getTotalInvitationCount() {
         return invitations.values().stream().mapToInt(Set::size).sum();
     }
-    
+
     /**
      * Check if invitation has expired
      */
@@ -134,42 +134,42 @@ public class InvitationManager {
         }
         return (System.currentTimeMillis() - timestamp) > INVITATION_TIMEOUT;
     }
-    
+
     /**
      * Get invitation key for internal use
      */
     private String getInvitationKey(UUID playerUUID, String clanName) {
         return playerUUID.toString() + ":" + clanName.toLowerCase();
     }
-    
+
     /**
      * Start cleanup task to remove expired invitations
      */
     private void startCleanupTask() {
         Bukkit.getScheduler().runTaskTimer(plugin, this::cleanupExpiredInvitations, 6000L, 6000L); // Run every 5 minutes
     }
-    
+
     /**
      * Cleanup expired invitations
      */
     private void cleanupExpiredInvitations() {
         long currentTime = System.currentTimeMillis();
         List<String> expiredKeys = new ArrayList<>();
-        
+
         for (Map.Entry<String, Long> entry : invitationTime.entrySet()) {
             if ((currentTime - entry.getValue()) > INVITATION_TIMEOUT) {
                 expiredKeys.add(entry.getKey());
             }
         }
-        
+
         for (String key : expiredKeys) {
             String[] parts = key.split(":");
             if (parts.length == 2) {
                 UUID playerUUID = UUID.fromString(parts[0]);
                 String clanName = parts[1];
-                
+
                 removeInvitation(playerUUID, clanName);
-                
+
                 // Notify player if online
                 Player player = Bukkit.getPlayer(playerUUID);
                 if (player != null && player.isOnline()) {
@@ -178,7 +178,7 @@ public class InvitationManager {
             }
         }
     }
-    
+
     /**
      * Get remaining time for an invitation
      */
@@ -190,7 +190,7 @@ public class InvitationManager {
         long elapsed = System.currentTimeMillis() - timestamp;
         return Math.max(0, INVITATION_TIMEOUT - elapsed);
     }
-    
+
     /**
      * Format remaining time as string
      */
@@ -198,18 +198,18 @@ public class InvitationManager {
         if (milliseconds <= 0) {
             return "Expired";
         }
-        
+
         long seconds = milliseconds / 1000;
         long minutes = seconds / 60;
         seconds = seconds % 60;
-        
+
         if (minutes > 0) {
             return minutes + "m " + seconds + "s";
         } else {
             return seconds + "s";
         }
     }
-    
+
     /**
      * Clear all invitations
      */
