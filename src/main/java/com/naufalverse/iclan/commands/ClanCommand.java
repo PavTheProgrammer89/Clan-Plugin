@@ -382,12 +382,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         String targetName = args[1];
         UUID playerUUID = player.getUniqueId();
 
-        if (!player.hasPermission("iclan.kick")) {
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
-            player.sendMessage(ChatColor.RED + "You don't have permission to kick clan members!");
-            return;
-        }
-
         Clan clan = plugin.getClanManager().getPlayerClan(playerUUID);
         if (clan == null) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
@@ -413,6 +407,13 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         if (!clan.isMember(targetUUID)) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "Player '" + targetName + "' is not in your clan!");
+            return;
+        }
+
+        Clan targetPlayerClan = plugin.getClanManager().getPlayerClan(targetUUID);
+        if (targetPlayerClan == null || !targetPlayerClan.getName().equals(clan.getName())) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "Security check failed: Player is not in your clan!");
             return;
         }
 
@@ -548,10 +549,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(ChatColor.YELLOW + "/clan disband" + ChatColor.GRAY + " - Disband your clan (owner only)");
             player.sendMessage(ChatColor.YELLOW + "/clan chat <message>" + ChatColor.GRAY + " - Send a message to your clan");
             player.sendMessage(ChatColor.YELLOW + "/clan list" + ChatColor.GRAY + " - List all clans");
-            player.sendMessage(ChatColor.BLACK + "=====================");
-            player.sendMessage(ChatColor.AQUA + "CREDITS");
-            player.sendMessage(ChatColor.BLUE + "zSLIDER_ FOR coming up with the idea");
-            player.sendMessage(ChatColor.AQUA + "NaufalVerse + incognit56 (formally Inco) FOR coding the plugin");
             player.sendMessage(ChatColor.GOLD + "=====================");
         }
     }
