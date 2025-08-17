@@ -70,7 +70,7 @@ A simple and efficient clan management plugin for PaperMC 1.21.7 servers.
 
 ## 📊 Clan Rules
 
-- **Clan Names**: 3-16 characters, letters and numbers only
+- **Clan Names**: 3-15 characters, letters and numbers only
 - **One Clan Per Player**: Players can only be in one clan at a time
 - **Owner Powers**: Only clan owners can accept/kick members and disband
 - **Join Requests**: Expire after 5 minutes automatically
@@ -85,7 +85,7 @@ The plugin automatically creates these files:
 
 ## 📋 Requirements
 
-- **Minecraft**: 1.21.7
+- **Minecraft**: 1.21.7+
 - **Server Software**: PaperMC (recommended) or Spigot
 - **Java**: 21 or higher
 
@@ -106,12 +106,12 @@ If you encounter any issues:
 
 ## 👥 Credits
 
-**Developed by**: [NaufalVerse](https://github.com/PavTheProgrammer89)  
+**Developed by**: [NaufalVerse](https://github.com/NaufalVerse) and [Inco](https://www.github.com/PavTheProgrammer89)
 **For**: PaperMC Minecraft Servers
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ---
 
