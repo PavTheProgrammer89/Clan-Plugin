@@ -8,7 +8,7 @@
     <!-- Project Information -->
     <groupId>com.naufalverse</groupId>
     <artifactId>iclan</artifactId>
-    <version>1.2.24</version>
+    <version>1.2.37</version>
     <packaging>jar</packaging>
 
     <name>iClan</name>

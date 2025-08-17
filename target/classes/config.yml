@@ -28,7 +28,12 @@ welcome-message: "&cWelcome to %clan%&c!"
 # Bad words filter
 badwords:
   - "rape"
+  - "r@pe"
   - "boobs"
+  - "bobis"
+  - "booooobs"
+  - "BOABIS"
+  -
 
 
 # Sound Settings
