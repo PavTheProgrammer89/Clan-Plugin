@@ -1,1 +1,1 @@
-// using MAVEN not GRADLE
+rootProject.name = 'iClan'

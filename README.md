@@ -24,6 +24,7 @@ A simple and efficient clan management plugin for PaperMC 1.21.7 servers.
 
 | Command                   | Description                    | Permission      |
 |---------------------------|--------------------------------|-----------------|
+| `/clan help`              | Sends a help menu              | `iclan.user`  |
 | `/clan create <name>`     | Create a new clan              | `iclan.create`  |
 | `/clan join <name>`       | Request to join a clan         | `iclan.join`    |
 | `/clan accept <username>` | Accept a player into your clan | `iclan.accept`  |
@@ -62,7 +63,7 @@ A simple and efficient clan management plugin for PaperMC 1.21.7 servers.
 
 ## 🎯 How It Works
 
-1. **Creating a Clan**: Use `/clan create MyClaN` to create your clan
+1. **Creating a Clan**: Use `/clan create MyClan` to create your clan
 2. **Joining**: Players use `/clan join MyClan` to request membership
 3. **Accepting**: Clan owners use `/clan accept PlayerName` to accept requests
 4. **Managing**: Owners can kick members, view info, or disband the clan
