@@ -537,7 +537,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendHelpMessage(Player player) {
-        if (!player.hasPermission("iclan.user")) {
             player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
             player.sendMessage(ChatColor.GOLD + "=== iClan Commands ===");
             player.sendMessage(ChatColor.YELLOW + "/clan create <name>" + ChatColor.GRAY + " - Create a new clan");
@@ -550,7 +549,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(ChatColor.YELLOW + "/clan chat <message>" + ChatColor.GRAY + " - Send a message to your clan");
             player.sendMessage(ChatColor.YELLOW + "/clan list" + ChatColor.GRAY + " - List all clans");
             player.sendMessage(ChatColor.GOLD + "=====================");
-        }
     }
 
     @Override
