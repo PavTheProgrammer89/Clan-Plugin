@@ -2,7 +2,7 @@ name: iClan
 version: ${project.version}
 main: com.naufalverse.iclan.IClanPlugin
 api-version: 1.21
-author: NaufalVerse
+author: NaufalVerse, incognit56
 description: A simple clan management plugin for PaperMC servers
 website: https://naufalverse.com
 

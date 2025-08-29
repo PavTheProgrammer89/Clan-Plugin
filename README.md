@@ -14,11 +14,12 @@ A simple and efficient clan management plugin for PaperMC 1.21.7 servers.
 
 ## 📦 Installation
 
-1. **Download** the latest `Clan-Plugin-main.zip` from the [releases page](https://github.com/PavTheProgrammer89/Clan-Plugin/releases)
+1. **Download** the latest `iClan.zip` from the [releases page](https://github.com/PavTheProgrammer89/Clan-Plugin/releases)
 2. **Unzip** the .zip file
-3. **Check** for the .jar in file build/libs
-4. **Restart** your PaperMC server
-5. **Done!** The plugin will generate its configuration files automatically
+3. **Check** for the .jar in file target/
+4. **Place** the .jar into your plugins folder
+5. **Restart** your PaperMC server
+6. **Done!** The plugin will generate its configuration files automatically
 
 ## 🎮 Commands
 
@@ -34,9 +35,10 @@ A simple and efficient clan management plugin for PaperMC 1.21.7 servers.
 | `/clan disband`           | Disband your clan              | `iclan.disband` |
 | `/clan list`              | List all clans on the server   | `iclan.list`    |
 | `/clan chat`              | Chat with your clan            | `iclan.chat`    |
+| `/clan ban <username> [appeal=true/false]`                 | Depending on appeal, ban any member from your clan with or withought an appeal            | `iclan.kick` |
 
 ### Command Aliases
-- `/clan` can also be used as `/c` or `/clans`
+- `/clan` can also be used as `/c`
 
 ## 🔐 Permissions
 
@@ -94,7 +96,7 @@ The plugin automatically creates these files:
 If you encounter any issues:
 
 1. Check the server console for error messages
-2. Ensure you're using PaperMC 1.21.7
+2. Ensure you're using PaperMC 1.21.7-8
 3. Verify Java 21 is installed
 4. Create an issue on our [GitHub repository](https://github.com/PavTheProgrammer89/Clan-Plugin/issues)
 
