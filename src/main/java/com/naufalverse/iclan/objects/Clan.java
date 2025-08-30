@@ -27,6 +27,7 @@ public class Clan {
         this.bannedMembersAppeals = new HashMap<>();
     }
 
+    // --- Basic getters ---
     public String getName() {
         return name;
     }
@@ -43,14 +44,30 @@ public class Clan {
         return creationTime;
     }
 
-    public Set<UUID> getBannedMembers() {
-        return new HashSet<>(bannedMembers);
+    // --- Banned members management ---
+    public void addBannedMember(UUID uuid) {
+        bannedMembers.add(uuid);
     }
 
-    public Map<UUID, Boolean> getBannedMembersAppeals() {
-        return new HashMap<>(bannedMembersAppeals);
+    public boolean isBanned(UUID uuid) {
+        return bannedMembers.contains(uuid);
     }
 
+    public void banMember(UUID member, boolean allowAppeal) {
+        bannedMembers.add(member);
+        bannedMembersAppeals.put(member, allowAppeal);
+    }
+
+    public void pardonMember(UUID member) {
+        bannedMembers.remove(member);
+        bannedMembersAppeals.remove(member);
+    }
+
+    public boolean canAppeal(UUID member) {
+        return bannedMembersAppeals.getOrDefault(member, false);
+    }
+
+    // --- Clan management ---
     public void setName(String name) {
         this.name = name;
     }
@@ -91,24 +108,6 @@ public class Clan {
 
     public int getMemberCount() {
         return members.size();
-    }
-
-    public void banMember(UUID member, boolean allowAppeal) {
-        bannedMembers.add(member);
-        bannedMembersAppeals.put(member, allowAppeal);
-    }
-
-    public void pardonMember(UUID member) {
-        bannedMembers.remove(member);
-        bannedMembersAppeals.remove(member);
-    }
-
-    public boolean isBanned(UUID member) {
-        return bannedMembers.contains(member);
-    }
-
-    public boolean canAppeal(UUID member) {
-        return bannedMembersAppeals.getOrDefault(member, false);
     }
 
     @Override

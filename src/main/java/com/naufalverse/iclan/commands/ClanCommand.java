@@ -210,6 +210,13 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
         UUID targetUUID = targetPlayer.getUniqueId();
 
+        // Check if the target player is banned
+        if (clan.isBanned(targetUUID)) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "You cannot accept banned users!");
+            return;
+        }
+
         if (!plugin.getInvitationManager().hasInvitation(targetUUID, clan.getName())) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "Player '" + targetName + "' has not requested to join your clan!");
@@ -233,6 +240,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         targetPlayer.playSound(targetPlayer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.2f);
         targetPlayer.sendMessage(ChatColor.GREEN + "You have been accepted into clan: " + ChatColor.YELLOW + clan.getName());
         targetPlayer.sendMessage(ChatColor.GRAY + "Accepted by: " + ChatColor.WHITE + player.getName());
+
         String welcomeMessage = plugin.getConfigManager().getWelcomeMessage();
         welcomeMessage = welcomeMessage.replace("%clan%", clan.getName());
         welcomeMessage = ChatColor.translateAlternateColorCodes('&', welcomeMessage);
@@ -247,6 +255,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             }
         }
     }
+
 
     private void handleInfo(Player player, String[] args) {
         UUID playerUUID = player.getUniqueId();
@@ -440,6 +449,70 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             }
         }
     }
+
+    private void handleBan(Player player, String[] args) {
+        if (args.length != 2) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "Usage: /clan ban <username>");
+            return;
+        }
+
+        String targetName = args[1];
+        UUID playerUUID = player.getUniqueId();
+
+        Clan clan = plugin.getClanManager().getPlayerClan(playerUUID);
+        if (clan == null) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "You are not in a clan!");
+            return;
+        }
+
+        if (!clan.isOwner(playerUUID)) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "Only the clan owner can ban members!");
+            return;
+        }
+
+        Player targetPlayer = Bukkit.getPlayer(targetName);
+        if (targetPlayer == null) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "Player '" + targetName + "' is not online!");
+            return;
+        }
+
+        UUID targetUUID = targetPlayer.getUniqueId();
+
+        if (!clan.isMember(targetUUID)) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "Player '" + targetName + "' is not in your clan!");
+            return;
+        }
+
+        if (clan.isOwner(targetUUID)) {
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
+            player.sendMessage(ChatColor.RED + "You cannot ban yourself!");
+            return;
+        }
+
+        clan.removeMember(targetUUID);
+        clan.addBannedMember(targetUUID); // Add to banned list
+        plugin.getClanManager().removeMemberFromClan(targetUUID);
+
+        player.playSound(player.getLocation(), Sound.ENTITY_PILLAGER_CELEBRATE, 0.8f, 1.2f);
+        player.sendMessage(ChatColor.GREEN + "You banned " + ChatColor.YELLOW + targetName + ChatColor.GREEN + " from the clan.");
+
+        targetPlayer.playSound(targetPlayer.getLocation(), Sound.BLOCK_ANVIL_LAND, 1.0f, 0.8f);
+        targetPlayer.sendMessage(ChatColor.RED + "You have been banned from clan: " + ChatColor.YELLOW + clan.getName());
+
+        for (UUID memberUUID : clan.getMembers()) {
+            Player member = Bukkit.getPlayer(memberUUID);
+            if (member != null && member.isOnline() && !member.equals(player)) {
+                member.playSound(member.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.7f, 0.8f);
+                member.sendMessage(ChatColor.YELLOW + targetName + ChatColor.GRAY + " has been banned from the clan.");
+            }
+        }
+    }
+
 
     private void handleChat(Player player, String[] args) {
         UUID playerUUID = player.getUniqueId();
