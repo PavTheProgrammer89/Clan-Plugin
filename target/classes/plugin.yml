@@ -1,5 +1,5 @@
 name: iClan
-version: 1.3.52
+version: 1.3.57-fatal-fix
 main: com.naufalverse.iclan.IClanPlugin
 api-version: 1.21
 author: NaufalVerse, incognit56
