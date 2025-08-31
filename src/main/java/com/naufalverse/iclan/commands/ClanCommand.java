@@ -210,8 +210,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
         UUID targetUUID = targetPlayer.getUniqueId();
 
-        // Check if the target player is banned
-        if (clan.isBanned(targetUUID)) {
+        if (plugin.getClanManager().isBanned(targetUUID)) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You cannot accept banned users!");
             return;
@@ -494,9 +493,10 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
+        // Remove + ban them
         clan.removeMember(targetUUID);
-        clan.addBannedMember(targetUUID); // Add to banned list
         plugin.getClanManager().removeMemberFromClan(targetUUID);
+        plugin.getClanManager().banPlayer(targetUUID); // ✅ adds to banned list
 
         player.playSound(player.getLocation(), Sound.ENTITY_PILLAGER_CELEBRATE, 0.8f, 1.2f);
         player.sendMessage(ChatColor.GREEN + "You banned " + ChatColor.YELLOW + targetName + ChatColor.GREEN + " from the clan.");
