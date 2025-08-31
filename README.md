@@ -25,7 +25,7 @@ A simple and efficient clan management plugin for PaperMC 1.21.7 servers.
 
 | Command                   | Description                    | Permission      |
 |---------------------------|--------------------------------|-----------------|
-| `/clan help`              | Sends a help menu              | `iclan.user`  |
+| `/clan help`              | Sends a help menu              | `iclan.user`    |
 | `/clan create <name>`     | Create a new clan              | `iclan.create`  |
 | `/clan join <name>`       | Request to join a clan         | `iclan.join`    |
 | `/clan accept <username>` | Accept a player into your clan | `iclan.accept`  |
@@ -35,7 +35,7 @@ A simple and efficient clan management plugin for PaperMC 1.21.7 servers.
 | `/clan disband`           | Disband your clan              | `iclan.disband` |
 | `/clan list`              | List all clans on the server   | `iclan.list`    |
 | `/clan chat`              | Chat with your clan            | `iclan.chat`    |
-| `/clan ban <username> [appeal=true/false]`                 | Depending on appeal, ban any member from your clan with or withought an appeal            | `iclan.kick` |
+| `/clan ban <username>`    | ban any member from your clan  | `iclan.kick`    |
 
 ### Command Aliases
 - `/clan` can also be used as `/c`
