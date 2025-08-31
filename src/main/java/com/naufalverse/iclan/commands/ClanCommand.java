@@ -1,6 +1,5 @@
 package com.naufalverse.iclan.commands;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,6 +61,9 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                 break;
             case "kick":
                 handleKick(player, args);
+                break;
+            case "ban":
+                handleBan(player, args);
                 break;
             case "list":
                 handleList(player);
@@ -210,6 +212,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
 
         UUID targetUUID = targetPlayer.getUniqueId();
 
+        // If your ClanManager exposes a global ban check, keep this. Otherwise, change to `clan.isBanned(targetUUID)`.
         if (plugin.getClanManager().isBanned(targetUUID)) {
             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.8f);
             player.sendMessage(ChatColor.RED + "You cannot accept banned users!");
@@ -254,7 +257,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             }
         }
     }
-
 
     private void handleInfo(Player player, String[] args) {
         UUID playerUUID = player.getUniqueId();
@@ -493,10 +495,9 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        // Remove + ban them
         clan.removeMember(targetUUID);
         plugin.getClanManager().removeMemberFromClan(targetUUID);
-        plugin.getClanManager().banPlayer(targetUUID); // ✅ adds to banned list
+        plugin.getClanManager().banPlayer(targetUUID);
 
         player.playSound(player.getLocation(), Sound.ENTITY_PILLAGER_CELEBRATE, 0.8f, 1.2f);
         player.sendMessage(ChatColor.GREEN + "You banned " + ChatColor.YELLOW + targetName + ChatColor.GREEN + " from the clan.");
@@ -512,7 +513,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
             }
         }
     }
-
 
     private void handleChat(Player player, String[] args) {
         UUID playerUUID = player.getUniqueId();
@@ -610,18 +610,19 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendHelpMessage(Player player) {
-            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
-            player.sendMessage(ChatColor.GOLD + "=== iClan Commands ===");
-            player.sendMessage(ChatColor.YELLOW + "/clan create <name>" + ChatColor.GRAY + " - Create a new clan");
-            player.sendMessage(ChatColor.YELLOW + "/clan join <name>" + ChatColor.GRAY + " - Request to join a clan");
-            player.sendMessage(ChatColor.YELLOW + "/clan accept <username>" + ChatColor.GRAY + " - Accept a player into your clan (any member)");
-            player.sendMessage(ChatColor.YELLOW + "/clan info [name]" + ChatColor.GRAY + " - Show clan information");
-            player.sendMessage(ChatColor.YELLOW + "/clan leave" + ChatColor.GRAY + " - Leave your current clan");
-            player.sendMessage(ChatColor.YELLOW + "/clan kick <username>" + ChatColor.GRAY + " - Kick a member from your clan (owner only)");
-            player.sendMessage(ChatColor.YELLOW + "/clan disband" + ChatColor.GRAY + " - Disband your clan (owner only)");
-            player.sendMessage(ChatColor.YELLOW + "/clan chat <message>" + ChatColor.GRAY + " - Send a message to your clan");
-            player.sendMessage(ChatColor.YELLOW + "/clan list" + ChatColor.GRAY + " - List all clans");
-            player.sendMessage(ChatColor.GOLD + "=====================");
+        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
+        player.sendMessage(ChatColor.GOLD + "=== iClan Commands ===");
+        player.sendMessage(ChatColor.YELLOW + "/clan create <name>" + ChatColor.GRAY + " - Create a new clan");
+        player.sendMessage(ChatColor.YELLOW + "/clan join <name>" + ChatColor.GRAY + " - Request to join a clan");
+        player.sendMessage(ChatColor.YELLOW + "/clan accept <username>" + ChatColor.GRAY + " - Accept a player into your clan (any member unless user is banned)");
+        player.sendMessage(ChatColor.YELLOW + "/clan info [name]" + ChatColor.GRAY + " - Show clan information");
+        player.sendMessage(ChatColor.YELLOW + "/clan leave" + ChatColor.GRAY + " - Leave your current clan");
+        player.sendMessage(ChatColor.YELLOW + "/clan kick <username>" + ChatColor.GRAY + " - Kick a member from your clan (owner only)");
+        player.sendMessage(ChatColor.YELLOW + "/clan ban <username>" + ChatColor.GRAY + " - Ban a member from your clan (owner only)");
+        player.sendMessage(ChatColor.YELLOW + "/clan disband" + ChatColor.GRAY + " - Disband your clan (owner only)");
+        player.sendMessage(ChatColor.YELLOW + "/clan chat <message>" + ChatColor.GRAY + " - Send a message to your clan");
+        player.sendMessage(ChatColor.YELLOW + "/clan list" + ChatColor.GRAY + " - List all clans");
+        player.sendMessage(ChatColor.GOLD + "=====================");
     }
 
     @Override
@@ -629,30 +630,56 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {
-            List<String> subcommands = Arrays.asList("create", "join", "accept", "info", "leave", "kick", "disband", "list", "chat", "help");
+            List<String> subcommands = Arrays.asList("create", "join", "accept", "info", "leave", "kick", "ban", "disband", "list", "chat", "help");
+            String prefix = args[0].toLowerCase();
             for (String subcommand : subcommands) {
-                if (subcommand.startsWith(args[0].toLowerCase())) {
+                if (subcommand.startsWith(prefix)) {
                     completions.add(subcommand);
                 }
             }
         } else if (args.length == 2) {
-            switch (args[0].toLowerCase()) {
+            String sub = args[0].toLowerCase();
+            String prefix = args[1].toLowerCase();
+
+            switch (sub) {
                 case "join":
                 case "info":
                     for (Clan clan : plugin.getClanManager().getAllClans()) {
-                        if (clan.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
+                        if (clan.getName().toLowerCase().startsWith(prefix)) {
                             completions.add(clan.getName());
                         }
                     }
                     break;
+
                 case "accept":
                 case "kick":
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        if (player.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
-                            completions.add(player.getName());
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        if (p.getName().toLowerCase().startsWith(prefix)) {
+                            completions.add(p.getName());
                         }
                     }
                     break;
+
+                case "ban":
+                    if (sender instanceof Player) {
+                        Player exec = (Player) sender;
+                        Clan clan = plugin.getClanManager().getPlayerClan(exec.getUniqueId());
+                        if (clan != null) {
+                            for (UUID memberUUID : clan.getMembers()) {
+                                if (memberUUID.equals(exec.getUniqueId())) continue;
+
+                                Player member = Bukkit.getPlayer(memberUUID);
+                                if (member != null && member.isOnline()) {
+                                    String name = member.getName();
+                                    if (name.toLowerCase().startsWith(prefix)) {
+                                        completions.add(name);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+
                 case "chat":
                 case "c":
                     break;

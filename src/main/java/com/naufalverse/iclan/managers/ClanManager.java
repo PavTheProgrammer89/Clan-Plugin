@@ -91,6 +91,7 @@ public class ClanManager {
         return banned != null && banned.contains(playerUUID);
     }
 
+    // Old ban method (based on current clan membership)
     public void banPlayer(UUID playerUUID) {
         String clanName = playerClans.get(playerUUID);
         if (clanName != null) {
@@ -99,6 +100,19 @@ public class ClanManager {
             removeMemberFromClan(playerUUID);
             plugin.getDataManager().saveData();
         }
+    }
+
+    // New ban method (ban from a specific clan, even if not in it)
+    public void banPlayer(UUID playerUUID, String clanName) {
+        bannedPlayers.computeIfAbsent(clanName.toLowerCase(), k -> new HashSet<>()).add(playerUUID);
+
+        Clan clan = getClan(clanName);
+        if (clan != null && clan.getMembers().contains(playerUUID)) {
+            clan.removeMember(playerUUID);
+            playerClans.remove(playerUUID);
+        }
+
+        plugin.getDataManager().saveData();
     }
 
     public void unbanPlayer(UUID playerUUID, String clanName) {
