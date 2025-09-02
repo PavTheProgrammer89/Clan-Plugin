@@ -75,6 +75,7 @@ permissions:
       iclan.accept: true
       iclan.kick: true
       iclan.disband: true
+      iclan.ban: true
 
   iclan.admin:
     description: Allows admin commands

@@ -1,5 +1,5 @@
 name: iClan
-version: 1.3.63
+version: 1.3.79
 main: com.naufalverse.iclan.IClanPlugin
 api-version: 1.21
 author: NaufalVerse, incognit56
@@ -75,6 +75,7 @@ permissions:
       iclan.accept: true
       iclan.kick: true
       iclan.disband: true
+      iclan.ban: true
 
   iclan.admin:
     description: Allows admin commands
