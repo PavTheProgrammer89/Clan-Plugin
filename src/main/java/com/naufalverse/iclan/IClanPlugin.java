@@ -74,12 +74,6 @@ public class IClanPlugin extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
         String message = event.getMessage();
 
-        checkBadWords(player, message, event);
-
-        if (event.isCancelled()) {
-            return;
-        }
-
         Clan clan = clanManager.getPlayerClan(player.getUniqueId());
 
         String clanPrefix = (clan != null) ?

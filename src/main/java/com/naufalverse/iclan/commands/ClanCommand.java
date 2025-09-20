@@ -640,16 +640,6 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ChatColor.GOLD + "================");
     }
 
-    private void checkBadWords(Player player, String message, PlayerChatEvent event) {
-        List<String> badWords = plugin.getConfigManager().getBadWords();
-
-        for (String badWord : badWords) {
-            if (message.toLowerCase().contains(badWord.toLowerCase())) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
     private void sendHelpMessage(Player player) {
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
         player.sendMessage(ChatColor.GOLD + "=== iClan Commands ===");
