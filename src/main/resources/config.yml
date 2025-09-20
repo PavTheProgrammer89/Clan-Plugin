@@ -25,17 +25,6 @@ chat:
 welcome-message: "&cWelcome to %clan%&c!"
 # add color config associated with welcome message here later
 
-# Bad words filter
-badwords:
-  - "rape"
-  - "r@pe"
-  - "boobs"
-  - "bobis"
-  - "booooobs"
-  - "BOABIS"
-  -
-
-
 # Sound Settings
 sounds:
   enable-sounds: true

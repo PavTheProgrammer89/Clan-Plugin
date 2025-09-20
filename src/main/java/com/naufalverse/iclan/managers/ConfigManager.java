@@ -149,10 +149,6 @@ public class ConfigManager {
         return config.getString("welcome-message", "&cWelcome to %clan%&c!");
     }
 
-    public List<String> getBadWords() {
-        return config.getStringList("badwords");
-    }
-
     public String getDatabasePassword() {
         return config.getString("database.password", "");
     }

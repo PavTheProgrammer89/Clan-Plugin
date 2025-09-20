@@ -96,17 +96,6 @@ public class IClanPlugin extends JavaPlugin implements Listener {
         updatePlayerTabName(player);
     }
 
-    private void checkBadWords(Player player, String message, AsyncPlayerChatEvent event) {
-        List<String> badWords = configManager.getBadWords();
-
-        for (String badWord : badWords) {
-            if (message.toLowerCase().contains(badWord.toLowerCase())) {
-                event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "Watch your language!");
-            }
-        }
-    }
-
     private void updatePlayerTabName(Player player) {
         Clan clan = clanManager.getPlayerClan(player.getUniqueId());
         String clanPrefix = (clan != null) ?
