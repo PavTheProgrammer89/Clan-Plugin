@@ -692,7 +692,7 @@ public class ClanCommand implements CommandExecutor, TabCompleter {
                     }
                     break;
 
-                case "chat":
+                case "chat":w
                 case "c":
                     break;
             }

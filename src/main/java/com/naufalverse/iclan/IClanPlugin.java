@@ -1,6 +1,12 @@
 package com.naufalverse.iclan;
 
+import com.naufalverse.iclan.commands.ClanCommand;
+import com.naufalverse.iclan.managers.ClanManager;
+import com.naufalverse.iclan.managers.ConfigManager;
+import com.naufalverse.iclan.managers.DataManager;
+import com.naufalverse.iclan.managers.InvitationManager;
 import com.naufalverse.iclan.objects.Clan;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,15 +14,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.naufalverse.iclan.commands.ClanCommand;
-import com.naufalverse.iclan.managers.ClanManager;
-import com.naufalverse.iclan.managers.DataManager;
-import com.naufalverse.iclan.managers.InvitationManager;
-import com.naufalverse.iclan.managers.ConfigManager;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-
-import java.util.List;
 
 public class IClanPlugin extends JavaPlugin implements Listener {
 
@@ -27,19 +26,23 @@ public class IClanPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        this.configManager = new ConfigManager(this);
+        saveDefaultConfig();
 
+        this.configManager = new ConfigManager(this);
         this.dataManager = new DataManager(this);
         this.clanManager = new ClanManager(this);
         this.invitationManager = new InvitationManager(this);
 
         dataManager.loadData();
 
-        getCommand("clan").setExecutor(new ClanCommand(this));
+        if (getCommand("clan") != null) {
+            getCommand("clan").setExecutor(new ClanCommand(this));
+            getCommand("clan").setTabCompleter(new ClanCommand(this));
+        }
 
-        getServer().getPluginManager().registerEvents(this, this);
+        Bukkit.getPluginManager().registerEvents(this, this);
 
-        getLogger().info("iClan plugin has been enabled!");
+        getLogger().info("✅ iClan has been enabled successfully!");
         getLogger().info("Loaded " + clanManager.getClanCount() + " clans.");
         getLogger().info("Config loaded with " + configManager.getAdmins().size() + " admins.");
     }
@@ -49,8 +52,7 @@ public class IClanPlugin extends JavaPlugin implements Listener {
         if (dataManager != null) {
             dataManager.saveData();
         }
-
-        getLogger().info("iClan plugin has been disabled!");
+        getLogger().info("❌ iClan has been disabled!");
     }
 
     public ClanManager getClanManager() {
@@ -72,59 +74,50 @@ public class IClanPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        String message = event.getMessage();
-
         Clan clan = clanManager.getPlayerClan(player.getUniqueId());
+        String prefix = (clan != null)
+                ? ChatColor.BLACK + "[" + ChatColor.AQUA + clan.getName() + ChatColor.BLACK + "] "
+                : ChatColor.DARK_GRAY + "[NoClan] ";
 
-        String clanPrefix = (clan != null) ?
-                ChatColor.BLACK + "[" + ChatColor.AQUA + clan.getName() + ChatColor.BLACK + "] " :
-                ChatColor.GRAY + "[NoClan] ";
-
-        String formatted = clanPrefix + player.getName() + ChatColor.WHITE + ": " + message;
-        event.setFormat(formatted);
+        // Asynchronous-safe formatting: first %s = player name, second %s = message
+        event.setFormat(prefix + ChatColor.WHITE + "%s: %s");
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        updatePlayerTabName(player);
-    }
-
-    private void updatePlayerTabName(Player player) {
-        Clan clan = clanManager.getPlayerClan(player.getUniqueId());
-        String clanPrefix = (clan != null) ?
-                ChatColor.AQUA + "[" + clan.getName() + "] " : "";
-
-        try {
-            Scoreboard scoreboard = player.getScoreboard();
-            if (scoreboard == null) {
-                scoreboard = getServer().getScoreboardManager().getNewScoreboard();
-                player.setScoreboard(scoreboard);
-            }
-
-            String teamName = "clan_" + player.getUniqueId().toString().substring(0, 8);
-
-            Team oldTeam = scoreboard.getTeam(teamName);
-            if (oldTeam != null) {
-                oldTeam.unregister();
-            }
-
-            Team team = scoreboard.registerNewTeam(teamName);
-            team.setPrefix(clanPrefix);
-            team.addEntry(player.getName());
-
-            player.setPlayerListName(team.getPrefix() + player.getName());
-
-        } catch (Exception e) {
-            player.setPlayerListName(clanPrefix + player.getName());
-        }
+        // delay a tick or two to avoid timing issues with tab/player state
+        Bukkit.getScheduler().runTaskLater(this, () -> updatePlayerTab(event.getPlayer()), 10L);
     }
 
     public void updatePlayerTab(Player player) {
-        updatePlayerTabName(player);
+        Clan clan = clanManager.getPlayerClan(player.getUniqueId());
+        String prefix = (clan != null) ? ChatColor.AQUA + "[" + clan.getName() + "] " : "";
+
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        String uuidPart = player.getUniqueId().toString().replace("-", "");
+        String teamName = "clan_" + (uuidPart.length() > 12 ? uuidPart.substring(0, 12) : uuidPart);
+
+        Team team = scoreboard.getTeam(teamName);
+        if (team == null) {
+            team = scoreboard.registerNewTeam(teamName);
+        }
+
+        // Set prefix (Bukkit limits may apply)
+        team.setPrefix(prefix);
+
+        if (!team.hasEntry(player.getName())) {
+            team.addEntry(player.getName());
+        }
+
+        // Also set the player list name
+        try {
+            player.setPlayerListName(prefix + player.getName());
+        } catch (Exception ignored) {
+            // fallback if setting player list name fails
+        }
     }
 
-    private boolean isPlayerAdmin(Player player) {
+    public boolean isAdmin(Player player) {
         return configManager.isAdmin(player.getName()) || player.isOp();
     }
 }

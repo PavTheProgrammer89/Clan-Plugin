@@ -1,7 +1,7 @@
 name: iClan
 version: ${project.version}
 main: com.naufalverse.iclan.IClanPlugin
-api-version: 1.21
+api-version: 1.21.10
 author: NaufalVerse, incognit56
 description: A simple clan management plugin for PaperMC servers
 website: https://naufalverse.com
@@ -17,16 +17,6 @@ permissions:
   iclan.user:
     description: Allows basic clan usage
     default: true
-    children:
-      iclan.create: true
-      iclan.join: true
-      iclan.leave: true
-      iclan.info: true
-      iclan.list: true
-      iclan.accept: true
-      iclan.kick: false
-      iclan.disband: false
-      iclan.chat: true
 
   iclan.create:
     description: Allows creating clans
@@ -86,11 +76,11 @@ permissions:
       iclan.reload: true
       iclan.backup: true
       iclan.spy: true
-  
+
   iclan.reload:
     description: Allows reloading the plugin
     default: op
-  
+
   iclan.backup:
     description: Allows backing up clan data
     default: op
